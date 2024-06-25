@@ -1,7 +1,10 @@
 #include "ConsoleManager.h"
+#include "MainMenuScreen.h"
 
-ConsoleManager::ConsoleManager()
-{
+ConsoleManager::ConsoleManager() {
+	auto MAIN_MENU = std::make_shared<MainMenuScreen>();
+	consoles[MAIN_MENU->getName()] = MAIN_MENU;
+	currentConsole = MAIN_MENU;
 }
 
 ConsoleManager::~ConsoleManager()
@@ -10,7 +13,9 @@ ConsoleManager::~ConsoleManager()
 
 void ConsoleManager::run()
 {
-	currentConsole->run();
+	if (currentConsole) {
+		currentConsole->onExecute();
+	}
 }
 
 
