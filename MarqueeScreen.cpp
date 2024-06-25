@@ -49,6 +49,9 @@ void MarqueeScreen::process() {
             dy = -dy;
         }
 
+        // TODO: Fix user input
+        // TODO: Add exit feature
+        
         // Check for user input
         if (GetAsyncKeyState(VK_BACK) & 0x1) {
             // Delete the last character from userInput
