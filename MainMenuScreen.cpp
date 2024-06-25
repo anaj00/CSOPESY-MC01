@@ -1,9 +1,12 @@
 #include <iostream>
 
 #include "MainMenuScreen.h"
+#include "ConsoleManager.h"
+
+extern ConsoleManager consoleManager;
 
 MainMenuScreen::MainMenuScreen()
-	: AConsole("Main Menu"){
+	: AConsole("MAIN_MENU"){
 
 }
 
@@ -58,6 +61,7 @@ void MainMenuScreen::handleCommand(string command) {
 
         } else if (command == "marquee") {
             std::cout << "This is a marquee text." << std::endl;
+            consoleManager.switchScreen("MARQUEE_SCREEN");
 
         // TODO: Add more commands here
 

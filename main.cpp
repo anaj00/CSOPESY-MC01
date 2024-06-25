@@ -4,9 +4,10 @@
 #include <iostream>
 #include "ConsoleManager.h"
 
+ConsoleManager consoleManager;
+
 int main()
 {
-    ConsoleManager consoleManager;
     consoleManager.run();
 
     return 0;

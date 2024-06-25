@@ -12,6 +12,7 @@ public:
 	~ConsoleManager();
 
 	void run(); // Function to run the console
+	void switchScreen(std::string consoleName); // Function to switch the console)
 
 private:
 	std::unordered_map<std::string, std::shared_ptr<AConsole>> consoles; // Map of consoles
