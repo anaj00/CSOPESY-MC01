@@ -35,4 +35,12 @@ void ConsoleManager::switchScreen(const std::string consoleName) {
 	}
 }
 
+bool ConsoleManager::isInitialized() {
+	return initialized;
+}
+
+void ConsoleManager::setInitialized(bool initialized) {
+	this->initialized = initialized;
+}
+
 

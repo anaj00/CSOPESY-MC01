@@ -51,11 +51,11 @@ void MainMenuScreen::handleCommand(string command) {
         std::cout << "Exiting the program..." << std::endl;
         exit(0);
 
-    } else if (command == "initialize") {
-        initialized = true;
+    } else if (command == "initialize" && !consoleManager.isInitialized()) {
+        consoleManager.setInitialized(true);
 		std::cout << "Initializing the program..." << std::endl;
 
-	} else if (initialized) {
+	} else if (consoleManager.isInitialized()) {
         if (command == "clear" || command == "cls") {
             system("cls");
 

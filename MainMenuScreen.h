@@ -14,7 +14,5 @@ public:
 private:
 	void displayHeader();
 	void handleCommand(string command);
-
-	bool initialized = false;
 };
 
