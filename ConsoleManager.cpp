@@ -1,6 +1,7 @@
 #include "ConsoleManager.h"
 #include "MainMenuScreen.h"
 #include "MarqueeScreen.h"
+#include "ConfigurationManager.h"
 
 ConsoleManager::ConsoleManager() {
 	auto MAIN_MENU = std::make_shared<MainMenuScreen>();
@@ -36,11 +37,17 @@ void ConsoleManager::switchScreen(const std::string consoleName) {
 }
 
 bool ConsoleManager::isInitialized() {
-	return initialized;
+	return configManager.isInitialized();
 }
 
-void ConsoleManager::setInitialized(bool initialized) {
-	this->initialized = initialized;
+void ConsoleManager::setInitialized() {
+	if (configManager.runInitialize()) {
+		std::cout << "Initialization successful..." << std::endl;
+	}
+}
+
+ConfigurationManager& ConsoleManager::getConfigurationManager() {
+	return configManager;
 }
 
 

@@ -52,15 +52,13 @@ void MainMenuScreen::handleCommand(string command) {
         exit(0);
 
     } else if (command == "initialize" && !consoleManager.isInitialized()) {
-        consoleManager.setInitialized(true);
-		std::cout << "Initializing the program..." << std::endl;
+        consoleManager.setInitialized();
 
 	} else if (consoleManager.isInitialized()) {
         if (command == "clear" || command == "cls") {
             system("cls");
 
         } else if (command == "marquee") {
-            std::cout << "This is a marquee text." << std::endl;
             consoleManager.switchScreen("MARQUEE_SCREEN");
 
         // TODO: Add more commands here
