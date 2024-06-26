@@ -17,6 +17,5 @@ public:
 
 private:
 	std::string name; // Name of the console
-	void handleCommand(string command); // Function to handle the command
 };
 
