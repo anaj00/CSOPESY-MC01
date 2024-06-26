@@ -2,6 +2,8 @@
 #include <string>
 #include <thread>
 #include <chrono>
+#include <conio.h>
+#include <algorithm>
 
 #include "MarqueeScreen.h"
 
@@ -49,33 +51,28 @@ void MarqueeScreen::process() {
             dy = -dy;
         }
 
-        // TODO: Fix user input
-        // TODO: Add exit feature
-        
         // Check for user input
-        if (GetAsyncKeyState(VK_BACK) & 0x1) {
-            // Delete the last character from userInput
-            if (!userInput.empty()) {
-                userInput.pop_back();
-                marqueeText = userInput;
-            }
-        }
+        if (_kbhit()) { // Check if a key has been pressed
+            char c = _getch(); // Get the character
 
-        else {
-            // Check for other input characters
-            for (char c = 'A'; c <= 'Z'; c++) {
-                if (GetAsyncKeyState(c) & 0x1) {
-                    userInput += static_cast<char>(tolower(c));
+            if (c == '\b') { // Handle backspace
+                if (!userInput.empty()) {
+                    userInput.pop_back();
                     marqueeText = userInput;
-                    break;
                 }
             }
-            for (char c = 'a'; c <= 'z'; c++) {
-                if (GetAsyncKeyState(c) & 0x1) {
-                    userInput += c;
-                    marqueeText = userInput;
-                    break;
-                }
+            else if (c == '\r') { // Handle enter key
+                std::string userInputCopy = userInput;
+                std::transform(userInputCopy.begin(), userInputCopy.end(), userInputCopy.begin(), ::tolower);
+
+                if (userInputCopy == "exit") {
+                    clearConsole();
+					return;
+				}
+            }
+            else {
+                userInput += c;
+                marqueeText = userInput;
             }
         }
 
