@@ -1,7 +1,8 @@
+#include <iostream>
+
 #include "ProcessScreen.h"
 
 ProcessScreen::ProcessScreen(Process myProcess)
-	//TODO: Pass Process Object and format a string for the process name
 	: AConsole("PROCESS_SCREEN_" + myProcess.getName()), thisProcess(myProcess) {
 }
 
@@ -16,20 +17,22 @@ void ProcessScreen::display() {
 
 void ProcessScreen::process() {
     string command;
-    while (true) {
+    bool running = true;
+
+    while (running) {
         std::cout << "> ";
         getline(cin, command);
-        handleCommand(command);
+        running = handleCommand(command);
         std::cout << endl;
     }
 }
 
 void ProcessScreen::displayHeader() {
-    //Displays process name and ID
+    // Displays process name and ID
     std::cout << "Process: " << thisProcess.getName() << endl;
     std::cout << "ID: " << thisProcess.getID() << endl << endl;
 
-    //Prints finished if process is done else print current line and total lines
+    // Prints finished if process is done else print current line and total lines
     if (!thisProcess.getIsFinished()) {
         std::cout << "Current instruction line: " << thisProcess.getCurrentInstruction() << endl;
         std::cout << "Lines of code: " << thisProcess.getTotalInstructions() << endl << endl;
@@ -39,17 +42,18 @@ void ProcessScreen::displayHeader() {
     }
 }
 
-void ProcessScreen::handleCommand(string command) {
+bool ProcessScreen::handleCommand(string command) {
     if (command == "exit") {
-        //TODO: return user to main menu
-        //Not sure if this is working already please check out
-        return;
+        system("cls");
+        return false;
     }
     else if (command == "process-smi") {
         onExecute();
+        return true;
     }
     else {
         std::cout << "Invalid command. Please try again." << endl;
+        return true;
     }
 }
 

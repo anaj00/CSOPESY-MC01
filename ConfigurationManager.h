@@ -9,12 +9,15 @@ public:
 	ConfigurationManager();
 	~ConfigurationManager();
 
-	bool runInitialize(); // returns true if initialization was successful
-	bool isInitialized(); // returns true if the configuration manager has been initialized
+	bool runInitialize(); // Returns true if initialization was successful
+	bool isInitialized(); // Returns true if the configuration manager has been initialized
+
+	int getMinInstructions() const; // Returns the minimum number of instructions a process can have
+	int getMaxInstructions() const; // Returns the maximum number of instructions a process can have
 
 private:
-	void parseConfigFile();	// parses the config file and sets the configuration values
-	void printConfig(); 	// prints the configuration values to the console
+	void parseConfigFile();	// Parses the config file and sets the configuration values
+	void printConfig(); 	// Prints the configuration values to the console
 
 	bool initialized = false;
 		

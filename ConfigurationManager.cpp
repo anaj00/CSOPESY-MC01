@@ -31,6 +31,14 @@ bool ConfigurationManager::isInitialized()
 	return initialized;
 }
 
+int ConfigurationManager::getMinInstructions() const {
+	return minInstructions;
+}
+
+int ConfigurationManager::getMaxInstructions() const {
+	return maxInstructions;
+}
+
 void ConfigurationManager::parseConfigFile() {
 	std::ifstream configFile("config.txt");
 

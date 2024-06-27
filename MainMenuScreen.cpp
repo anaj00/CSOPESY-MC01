@@ -61,7 +61,15 @@ void MainMenuScreen::handleCommand(string command) {
         } else if (command == "marquee") {
             consoleManager.switchScreen("MARQUEE_SCREEN");
 
-        // TODO: Add more commands here
+        } else if (command.substr(0,6) == "screen") {
+            if (command == "screen -ls") {
+                std::cout << "I am screen -ls!";
+            }
+
+            else if (command.substr(0,9) == "screen -s") {
+                std::string processName = command.substr(10);
+                consoleManager.createProcessScreen(processName);
+            }
 
         } else {
             std::cout << "Invalid command. Please try again.\n";

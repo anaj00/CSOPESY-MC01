@@ -16,7 +16,7 @@ public:
 
 private:
 	void displayHeader();
-	void handleCommand(string command);
+	bool handleCommand(string command);
 
 	Process thisProcess;
 };

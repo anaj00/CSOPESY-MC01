@@ -5,6 +5,7 @@
 
 #include "AConsole.h"
 #include "ConfigurationManager.h"
+#include "Scheduler.h"
 
 class ConsoleManager
 {
@@ -20,11 +21,20 @@ public:
 	void setInitialized(); // Function to set the console as initialized
 	ConfigurationManager& getConfigurationManager(); // Function to get the configuration manager
 
-private:
+	const std::unordered_map<std::string, std::shared_ptr<AConsole>>& getConsoles() const; // Function to get the consoles
+	void addConsole(std::shared_ptr<AConsole> console); // Function to add a new console
 
+	Scheduler& getScheduler(); // Function to get the scheduler
+	void createProcessScreen(const std::string processName); // Function to create a process screen)
+
+private:
 	std::unordered_map<std::string, std::shared_ptr<AConsole>> consoles; // Map of consoles
 	std::shared_ptr<AConsole> previousConsole; // Pointer to the previous console
 	std::shared_ptr<AConsole> currentConsole; // Pointer to the current console
 	ConfigurationManager configManager; // Configuration manager object
+	Scheduler scheduler; // Scheduler object
+
+	int processID = 0; // Process ID Tracker
+	int getRandomInstruction(); // Function to get a random number of instructions
 };
 
