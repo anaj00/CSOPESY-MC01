@@ -6,6 +6,9 @@
 #include <algorithm>
 
 #include "MarqueeScreen.h"
+#include "ConsoleManager.h"
+
+extern ConsoleManager consoleManager;
 
 MarqueeScreen::MarqueeScreen()
 	: AConsole("MARQUEE_SCREEN") {
@@ -66,7 +69,7 @@ void MarqueeScreen::process() {
                 std::transform(userInputCopy.begin(), userInputCopy.end(), userInputCopy.begin(), ::tolower);
 
                 if (userInputCopy == "exit") {
-                    clearConsole();
+                    consoleManager.returnToPreviousScreen();
 					return;
 				}
             }
