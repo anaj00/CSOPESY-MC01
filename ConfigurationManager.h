@@ -3,31 +3,37 @@
 #include <string>
 #include <unordered_map>
 
-class ConfigurationManager
-{
+class ConfigurationManager {
 public:
-	ConfigurationManager();
-	~ConfigurationManager();
+    static ConfigurationManager& getInstance();
 
-	bool runInitialize(); // Returns true if initialization was successful
-	bool isInitialized(); // Returns true if the configuration manager has been initialized
+    bool runInitialize(); // Returns true if initialization was successful
+    bool isInitialized() const; // Returns true if the configuration manager has been initialized
 
-	int getMinInstructions() const; // Returns the minimum number of instructions a process can have
-	int getMaxInstructions() const; // Returns the maximum number of instructions a process can have
+    int getMinInstructions() const; // Returns the minimum number of instructions a process can have
+    int getMaxInstructions() const; // Returns the maximum number of instructions a process can have
+    int getNumCPU() const;
+    std::string getSchedulerAlgorithm() const;
+    int getQuantumCycles() const;
+    bool isPreemptive() const;
+    int getBatchProcessFrequency() const;
+    int getDelayPerExec() const;
 
 private:
-	void parseConfigFile();	// Parses the config file and sets the configuration values
-	void printConfig(); 	// Prints the configuration values to the console
+    ConfigurationManager();
+    ~ConfigurationManager();
 
-	bool initialized = false;
-		
-	int numCPU;
-	std::string schedulerAlgorithm;
-	int quantumCycles;
-	bool preemptive;
-	int batchProcessFrequency;
-	int minInstructions;
-	int maxInstructions;
-	int delayPerExec;
+    void parseConfigFile(); // Parses the config file and sets the configuration values
+    void printConfig(); // Prints the configuration values to the console
+
+    bool initialized = false;
+
+    int numCPU;
+    std::string schedulerAlgorithm;
+    int quantumCycles;
+    bool preemptive;
+    int batchProcessFrequency;
+    int minInstructions;
+    int maxInstructions;
+    int delayPerExec;
 };
-
