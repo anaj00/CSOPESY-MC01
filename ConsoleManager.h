@@ -29,11 +29,12 @@ public:
 	void createProcessScreen(const std::string processName); // Function to create a process screen)
 
 private:
+	ConfigurationManager configManager; // Configuration manager object
+	Scheduler scheduler; // Scheduler object
+
 	std::unordered_map<std::string, std::shared_ptr<AConsole>> consoles; // Map of consoles
 	std::shared_ptr<AConsole> previousConsole; // Pointer to the previous console
 	std::shared_ptr<AConsole> currentConsole; // Pointer to the current console
-	ConfigurationManager configManager; // Configuration manager object
-	Scheduler scheduler; // Scheduler object
 
 	int processID = 0; // Process ID Tracker
 	int getRandomInstruction(); // Function to get a random number of instructions

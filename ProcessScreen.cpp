@@ -36,7 +36,7 @@ void ProcessScreen::displayHeader() {
     std::cout << "ID: " << thisProcess.getID() << endl << endl;
 
     // Prints finished if process is done else print current line and total lines
-    if (!thisProcess.getIsFinished()) {
+    if (!thisProcess.isFinished()) {
         std::cout << "Current instruction line: " << thisProcess.getCurrentInstruction() << endl;
         std::cout << "Lines of code: " << thisProcess.getTotalInstructions() << endl << endl;
     }
