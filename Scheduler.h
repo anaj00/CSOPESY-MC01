@@ -41,11 +41,11 @@ private:
 	void scheduleRR();
 	void generateProcess(int& ID, int instructionCount);
 
-	bool running = true;
+	bool running = false;
 	bool isTestRunning = true;
 	
 	int processTestNumber = 0;
-	int processTestIteration = 0;
+	int processTestIteration = 0; 
 	int numCores;
 
 };

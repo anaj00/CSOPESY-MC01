@@ -122,6 +122,7 @@ void Scheduler::startSchedulerTest(int& ID, std::function<int()> getRandomInstru
 
 void Scheduler::stopSchedulerTest() {
 	isTestRunning = false;
+	processTestIteration++;
 }
 
 
