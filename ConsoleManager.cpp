@@ -63,18 +63,6 @@ void ConsoleManager::addConsole(std::shared_ptr<AConsole> console) {
 	consoles[console->getName()] = console;
 }
 
-void ConsoleManager::returnToPreviousScreen() {
-	if (previousConsole) {
-		currentConsole = previousConsole;
-		previousConsole = nullptr;
-		system("cls");
-		currentConsole->onExecute();
-	}
-	else {
-		std::cerr << "No previous screen to return to." << std::endl;
-	}
-}
-
 Scheduler& ConsoleManager::getScheduler() {
 	return scheduler;
 }

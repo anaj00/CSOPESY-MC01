@@ -1,9 +1,6 @@
 #include <iostream>
 
 #include "ProcessScreen.h"
-#include "ConsoleManager.h"
-
-extern ConsoleManager consoleManager;
 
 ProcessScreen::ProcessScreen(Process myProcess)
 	: AConsole("PROCESS_SCREEN_" + myProcess.getName()), thisProcess(myProcess) {
@@ -47,7 +44,7 @@ void ProcessScreen::displayHeader() {
 
 bool ProcessScreen::handleCommand(string command) {
     if (command == "exit") {
-        consoleManager.returnToPreviousScreen();
+        system("cls");
         return false;
     }
     else if (command == "process-smi") {
