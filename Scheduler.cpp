@@ -54,9 +54,9 @@ void Scheduler::run() {
 		else if (configManager->getSchedulerAlgorithm() == "rr") {
 			scheduleRR();
 		}
-	}
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(configManager->getDelayPerExec() * 1000));
+		std::this_thread::sleep_for(std::chrono::milliseconds(configManager->getDelayPerExec() * 1000));
+	}
 }
 
 void Scheduler::stop() {
@@ -81,7 +81,7 @@ void Scheduler::saveReport() const {
 	// TODO: Add report data here
 }
 
-void Scheduler::startSchedulerTest() {
+void Scheduler::startSchedulerTest(int& ID, std::function<int()> getRandomInstruction) {
 	// TODO: generate function every x seconds
 	// Set looping condition to true if turned off. 
 	if (!isTestRunning) {
@@ -89,13 +89,19 @@ void Scheduler::startSchedulerTest() {
 	}
 	while (isTestRunning) {
 		// generate function
+		int instructionCount = getRandomInstruction();
+		generateProcess(ID, instructionCount);
 		// wait 
+		std::this_thread::sleep_for(std::chrono::milliseconds(configManager->getBatchProcessFrequency() * 1000));
 	}
+	
 }
+
 
 void Scheduler::stopSchedulerTest() {
 	isTestRunning = false;
 }
+
 
 void Scheduler::scheduleFCFS() {
 	if (!readyQueue.empty()) {
@@ -136,10 +142,17 @@ void Scheduler::scheduleRR() {
 	}
 }
 
-void Scheduler::generateProcess() {
+void Scheduler::generateProcess(int& ID, int instructionCount) {
 	std::string processName = "SchedTest";
 	processName.append("_" + std::to_string(processTestIteration));
 	processName.append("_" + std::to_string(processTestNumber));
+
+
+	Process newProcess(processName, ID, instructionCount);
+	addProcess(newProcess);
+
+	ID++;
+	processTestNumber++;
 }
 
 

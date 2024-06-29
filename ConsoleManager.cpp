@@ -48,6 +48,8 @@ bool ConsoleManager::isInitialized() {
 void ConsoleManager::setInitialized() {
 	if (configManager.initialize() && scheduler.initialize(&configManager)) {
 		std::cout << "Initialization successful..." << std::endl;
+		std::thread schedulerThread(&Scheduler::run, &scheduler);
+		schedulerThread.detach();
 	}
 }
 
@@ -74,11 +76,11 @@ void ConsoleManager::returnToPreviousScreen() {
 		std::cerr << "No previous screen to return to." << std::endl;
 	}
 }
-/*
+
 Scheduler& ConsoleManager::getScheduler() {
 	return scheduler;
 }
-*/
+
 
 void ConsoleManager::createProcessScreen(const std::string processName) {
 	processID++;
@@ -105,4 +107,20 @@ int ConsoleManager::getRandomInstruction() {
 	return distr(gen);
 }
 
+void ConsoleManager::startSchedulerTest() {
+	std::thread schedulerThread([this]() {
+		this->scheduler.startSchedulerTest(this->processID, [this]() {
+			return this->getRandomInstruction();
+			});
+		});
+	schedulerThread.detach();
+}
 
+
+void ConsoleManager::stopSchedulerTest() {
+	scheduler.stopSchedulerTest();
+}
+
+void ConsoleManager::getAllProcesses() {
+	scheduler.getAllProcesses();
+}

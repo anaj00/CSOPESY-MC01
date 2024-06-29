@@ -3,10 +3,11 @@
 #include <vector>
 #include <memory>
 #include <queue>
+#include <functional>
 
 #include "Process.h"
 #include "ConfigurationManager.h"
-#include "ConsoleManager.h"
+
 
 class Scheduler
 {
@@ -23,7 +24,7 @@ public:
 	void stop();
 	void displayStatus() const;
 	void saveReport() const;
-	void startSchedulerTest();
+	void startSchedulerTest(int& ID, std::function<int()> getRandomInstruction);
 	void stopSchedulerTest();
 
 private:
@@ -35,12 +36,13 @@ private:
 	void scheduleFCFS();
 	void scheduleSJF();
 	void scheduleRR();
-	void generateProcess();
+	void generateProcess(int& ID, int instructionCount);
 
 	bool running = false;
 	bool isTestRunning = true;
 	
 	int processTestNumber = 0;
 	int processTestIteration = 0;
+	int (*getRandomInstruction)() = nullptr;
 };
 
