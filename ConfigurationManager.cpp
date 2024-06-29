@@ -12,7 +12,7 @@ ConfigurationManager::ConfigurationManager()
 ConfigurationManager::~ConfigurationManager()
 {}
 
-bool ConfigurationManager::runInitialize()
+bool ConfigurationManager::initialize()
 {
 	try {
 		parseConfigFile();
@@ -31,12 +31,36 @@ bool ConfigurationManager::isInitialized()
 	return initialized;
 }
 
+int ConfigurationManager::getNumCPU() const {
+	return numCPU;
+}
+
+std::string ConfigurationManager::getSchedulerAlgorithm() const {
+	return schedulerAlgorithm;
+}
+
+int ConfigurationManager::getQuantumCycles() const {
+	return quantumCycles;
+}
+
+bool ConfigurationManager::isPreemptive() const {
+	return preemptive;
+}
+
+int ConfigurationManager::getBatchProcessFrequency() const {
+	return batchProcessFrequency;
+}
+
 int ConfigurationManager::getMinInstructions() const {
 	return minInstructions;
 }
 
 int ConfigurationManager::getMaxInstructions() const {
 	return maxInstructions;
+}
+
+int ConfigurationManager::getDelayPerExec() const {
+	return delayPerExec;
 }
 
 void ConfigurationManager::parseConfigFile() {

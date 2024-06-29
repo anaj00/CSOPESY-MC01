@@ -9,11 +9,17 @@ public:
 	ConfigurationManager();
 	~ConfigurationManager();
 
-	bool runInitialize(); // Returns true if initialization was successful
+	bool initialize(); // Returns true if initialization was successful
 	bool isInitialized(); // Returns true if the configuration manager has been initialized
 
+	int getNumCPU() const; // Returns the number of CPUs
+	std::string getSchedulerAlgorithm() const; // Returns the scheduler algorithm
+	int getQuantumCycles() const; // Returns the quantum cycles
+	bool isPreemptive() const; // Returns true if the scheduler is preemptive
+	int getBatchProcessFrequency() const; // Returns the batch process frequency
 	int getMinInstructions() const; // Returns the minimum number of instructions a process can have
 	int getMaxInstructions() const; // Returns the maximum number of instructions a process can have
+	int getDelayPerExec() const; // Returns the delay per execution
 
 private:
 	void parseConfigFile();	// Parses the config file and sets the configuration values
