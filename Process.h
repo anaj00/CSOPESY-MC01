@@ -10,7 +10,7 @@ public:
 	int getID() const;
 	int getCurrentInstruction() const;
 	int getTotalInstructions() const;
-	bool getIsFinished() const;
+	bool isFinished() const;
 	void execute();
 
 private:
@@ -18,6 +18,6 @@ private:
 	int id;
 	int currentInstruction;
 	int totalInstructions;
-	bool isFinished;
+	bool finished;
 };
 
