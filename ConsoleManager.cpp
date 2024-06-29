@@ -46,7 +46,8 @@ bool ConsoleManager::isInitialized() {
 }
 
 void ConsoleManager::setInitialized() {
-	if (configManager.runInitialize()) {
+	if (configManager.initialize() && scheduler.initialize()) {
+
 		std::cout << "Initialization successful..." << std::endl;
 	}
 }
