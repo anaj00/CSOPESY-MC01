@@ -23,8 +23,25 @@ std::shared_ptr<Process> Scheduler::getProcessByName(const std::string& name) {
 }
 
 void Scheduler::getAllProcesses() {
+	std::cout << "-------------------------------" << std::endl;
+	std::cout << "CPU utilization: " << std::endl;
+	std::cout << "Cores used: " << std::endl;
+	std::cout << "Cores available: " << std::endl << std::endl;
+
+	std::cout << "Finished: " << std::endl << std::endl;
 	for (auto& process : processes) {
-		std::cout << process->getName() << std::endl;
+		if (process->isFinished()) {
+			std::cout << process->getName() << std::endl;
+		} 
+	}
+	
+	std::cout << std::endl;
+
+	std::cout << "Not finished: " << std::endl;
+	for (auto& process : processes) {
+		if (process -> isFinished() == false) {
+			std::cout << process->getName() << std::endl;
+		}
 	}
 }
 
@@ -42,19 +59,24 @@ bool Scheduler::initialize(ConfigurationManager* newConfigManager) {
 }
 
 void Scheduler::run() {
+	// TODO: make this into multi core implementation
+	std::cout << configManager -> getSchedulerAlgorithm() << std::endl;
 	while (running) {
 		if (configManager->getSchedulerAlgorithm() == "fcfs") {
 			scheduleFCFS();
+			std::cout << "FCFS" << std::endl;
 		}
 
 		else if (configManager->getSchedulerAlgorithm() == "sjf") {
 			scheduleSJF();
+			std::cout << "SJF" << std::endl;
 		}
 
 		else if (configManager->getSchedulerAlgorithm() == "rr") {
 			scheduleRR();
+			std::cout << "RR" << std::endl;
 		}
-
+		
 		std::this_thread::sleep_for(std::chrono::milliseconds(configManager->getDelayPerExec() * 1000));
 	}
 }

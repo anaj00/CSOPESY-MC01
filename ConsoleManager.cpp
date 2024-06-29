@@ -122,5 +122,5 @@ void ConsoleManager::stopSchedulerTest() {
 }
 
 void ConsoleManager::getAllProcesses() {
-	scheduler.getAllProcesses();
+	scheduler.getAllProcesses();	
 }

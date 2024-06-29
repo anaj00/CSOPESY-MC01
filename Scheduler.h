@@ -29,20 +29,24 @@ public:
 
 private:
 	ConfigurationManager* configManager;
-
+	// TODO: change implementation of process queues
 	std::vector<std::shared_ptr<Process>> processes;
 	std::queue<std::shared_ptr<Process>> readyQueue;
+	std::vector<Process> finishedProcesses; // Add finished processes here
+
+
 
 	void scheduleFCFS();
 	void scheduleSJF();
 	void scheduleRR();
 	void generateProcess(int& ID, int instructionCount);
 
-	bool running = false;
+	bool running = true;
 	bool isTestRunning = true;
 	
 	int processTestNumber = 0;
 	int processTestIteration = 0;
-	int (*getRandomInstruction)() = nullptr;
+	int numCores;
+
 };
 
