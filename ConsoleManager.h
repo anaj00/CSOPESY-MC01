@@ -25,7 +25,7 @@ public:
 	void addConsole(std::shared_ptr<AConsole> console); // Function to add a new console
 	void returnToPreviousScreen(); // Function to return to the previous screen
 
-	Scheduler& getScheduler(); // Function to get the scheduler
+	// Scheduler& getScheduler(); // Function to get the scheduler
 	void createProcessScreen(const std::string processName); // Function to create a process screen)
 
 private:

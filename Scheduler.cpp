@@ -22,6 +22,12 @@ std::shared_ptr<Process> Scheduler::getProcessByName(const std::string& name) {
 	return nullptr;
 }
 
+void Scheduler::getAllProcesses() {
+	for (auto& process : processes) {
+		std::cout << process->getName() << std::endl;
+	}
+}
+
 bool Scheduler::initialize(ConfigurationManager* newConfigManager) {
 	try {
 		configManager = newConfigManager;
@@ -75,6 +81,22 @@ void Scheduler::saveReport() const {
 	// TODO: Add report data here
 }
 
+void Scheduler::startSchedulerTest() {
+	// TODO: generate function every x seconds
+	// Set looping condition to true if turned off. 
+	if (!isTestRunning) {
+		isTestRunning = true;
+	}
+	while (isTestRunning) {
+		// generate function
+		// wait 
+	}
+}
+
+void Scheduler::stopSchedulerTest() {
+	isTestRunning = false;
+}
+
 void Scheduler::scheduleFCFS() {
 	if (!readyQueue.empty()) {
 		auto process = readyQueue.front(); // Get the first process in the queue
@@ -113,4 +135,12 @@ void Scheduler::scheduleRR() {
 		}
 	}
 }
+
+void Scheduler::generateProcess() {
+	std::string processName = "SchedTest";
+	processName.append("_" + std::to_string(processTestIteration));
+	processName.append("_" + std::to_string(processTestNumber));
+}
+
+
 

@@ -74,10 +74,11 @@ void ConsoleManager::returnToPreviousScreen() {
 		std::cerr << "No previous screen to return to." << std::endl;
 	}
 }
-
+/*
 Scheduler& ConsoleManager::getScheduler() {
 	return scheduler;
 }
+*/
 
 void ConsoleManager::createProcessScreen(const std::string processName) {
 	processID++;
