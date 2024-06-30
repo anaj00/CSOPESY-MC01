@@ -30,23 +30,24 @@ public:
 private:
 	ConfigurationManager* configManager;
 	// TODO: change implementation of process queues
-	std::vector<std::shared_ptr<Process>> processes;
-	std::queue<std::shared_ptr<Process>> readyQueue;
+	std::vector<std::shared_ptr<Process>> processes; // All processes regardless of state
+	std::vector<std::queue<std::shared_ptr<Process>>> readyQueues; // All processes ready to go once a thread yields
 	std::vector<Process> finishedProcesses; // Add finished processes here
-
+	std::queue<std::shared_ptr<Process>> processQueues; // holder for processes not yet in rq
 
 
 	void scheduleFCFS();
 	void scheduleSJF();
 	void scheduleRR();
 	void generateProcess(int& ID, int instructionCount);
-
+	
 	bool running = false;
 	bool isTestRunning = true;
 	
 	int processTestNumber = 0;
 	int processTestIteration = 0; 
 	int numCores;
+	int fcfsCoreTracker = 0;
 
 };
 

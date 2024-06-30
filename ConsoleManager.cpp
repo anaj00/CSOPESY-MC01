@@ -87,6 +87,9 @@ void ConsoleManager::createProcessScreen(const std::string processName) {
 
 	// Create new process
 	Process newProcess(processName, processID, getRandomInstruction());
+	std::cout << newProcess.getName() << "\n";
+	std::cout << newProcess.getID() << "\n";
+	std::cout << newProcess.getTotalInstructions() << "\n";
 	scheduler.addProcess(newProcess);
 
 	// Create new process screen

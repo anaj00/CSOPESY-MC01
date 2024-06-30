@@ -10,6 +10,8 @@ public:
 	int getID() const;
 	int getCurrentInstruction() const;
 	int getTotalInstructions() const;
+	int getCore();
+	void setCore(int coreID);
 	bool isFinished() const;
 	void execute();
 
@@ -18,6 +20,7 @@ private:
 	int id;
 	int currentInstruction;
 	int totalInstructions;
+	int core;
 	bool finished;
 };
 

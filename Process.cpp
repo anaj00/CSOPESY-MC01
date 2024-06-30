@@ -18,6 +18,13 @@ int Process::getCurrentInstruction() const {
 int Process::getTotalInstructions() const {
 	return totalInstructions;
 }
+int Process::getCore() {
+	return core;
+}
+
+void Process::setCore(int coreID) {
+	core = coreID;
+};
 
 bool Process::isFinished() const {
 	return finished;

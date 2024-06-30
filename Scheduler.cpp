@@ -11,6 +11,7 @@ Scheduler::~Scheduler() {}
 
 void Scheduler::addProcess(const Process& process) {
 	processes.push_back(std::make_shared<Process>(process));
+	processQueues.push(std::make_shared<Process>(process));
 }
 
 std::shared_ptr<Process> Scheduler::getProcessByName(const std::string& name) {
@@ -49,6 +50,7 @@ bool Scheduler::initialize(ConfigurationManager* newConfigManager) {
 	try {
 		configManager = newConfigManager;
 		running = true;
+		numCores = configManager->getNumCPU();
 		return true;
 
 	}
@@ -64,17 +66,14 @@ void Scheduler::run() {
 	while (running) {
 		if (configManager->getSchedulerAlgorithm() == "fcfs") {
 			scheduleFCFS();
-			std::cout << "FCFS" << std::endl;
 		}
 
 		else if (configManager->getSchedulerAlgorithm() == "sjf") {
 			scheduleSJF();
-			std::cout << "SJF" << std::endl;
 		}
 
 		else if (configManager->getSchedulerAlgorithm() == "rr") {
 			scheduleRR();
-			std::cout << "RR" << std::endl;
 		}
 		
 		std::this_thread::sleep_for(std::chrono::milliseconds(configManager->getDelayPerExec() * 1000));
@@ -127,42 +126,77 @@ void Scheduler::stopSchedulerTest() {
 
 
 void Scheduler::scheduleFCFS() {
-	if (!readyQueue.empty()) {
-		auto process = readyQueue.front(); // Get the first process in the queue
-		readyQueue.pop(); // Remove the process from the queue
-		// Simulate process execution
-		std::cout << "Executing process: " << process->getName() << "\n";
-		// Assume the process is finished for simplicity
-		process->execute();
+	if (processQueues.empty()) return;
+
+	auto process = processQueues.front();
+	processQueues.pop();
+	
+	process->setCore(fcfsCoreTracker);
+	readyQueues[fcfsCoreTracker].push(process);
+
+	std::cout << process->getCore() << std::endl;
+	if (fcfsCoreTracker + 1 == numCores) {
+		fcfsCoreTracker = 0;
+	}
+	else {
+		fcfsCoreTracker++;
 	}
 }
 
 void Scheduler::scheduleSJF() {
-	if (!readyQueue.empty()) {
-		std::sort(processes.begin(), processes.end(), [](const std::shared_ptr<Process>& a, const std::shared_ptr<Process>& b) {
+	if (processQueues.empty()) return;
+	// sort process queues on lowest totalInstruction
+	if (processQueues.size() > 1) {
+		std::vector<std::shared_ptr<Process>> processVector;
+
+		// Transfer elements from queue to vector
+		while (!processQueues.empty()) {
+			processVector.push_back(processQueues.front());
+			processQueues.pop();
+		}
+
+		// Sort the vector based on the total instructions of the processes
+		std::sort(processVector.begin(), processVector.end(), [](const std::shared_ptr<Process>& a, const std::shared_ptr<Process>& b) {
 			return a->getTotalInstructions() < b->getTotalInstructions();
-			}); // Sort the processes by total instructions
-		auto process = readyQueue.front(); // Get the first process in the queue
-		readyQueue.pop(); // Remove the process from the queue
-		// Simulate process execution
-		std::cout << "Executing process: " << process->getName() << "\n";
-		// Assume the process is finished for simplicity
-		process->execute();
+			});
+
+		// Transfer elements back from vector to queue
+		for (const auto& process : processVector) {
+			processQueues.push(process);
+		}
 	}
+
+	auto process = processQueues.front();
+	processQueues.pop();
+
+	// check if there is an open core
+	for (int core = 0; core < numCores; core++) {
+		if (readyQueues[core].empty()) {
+			process->setCore(core);
+			readyQueues[core].push(process);
+			return;
+		} 
+	}
+
+	// check for most available core
+	int lowestQueue = 0;
+	int bestCore = 0;
+	for (int core = 0; core < numCores; core++) {
+		if (core == 0) {
+			lowestQueue = readyQueues[core].size();
+			bestCore = core;
+		} else {
+			if (readyQueues[core].size() < lowestQueue) {
+				bestCore = core;
+			}
+		}
+	}
+	process->setCore(bestCore);
+	readyQueues[bestCore].push(process);
 }
 
 void Scheduler::scheduleRR() {
-	if (!readyQueue.empty()) {
-		auto process = readyQueue.front(); // Get the first process in the queue
-		readyQueue.pop(); // Remove the process from the queue
-		// Simulate process execution
-		std::cout << "Executing process: " << process->getName() << " for " << configManager->getQuantumCycles() << " cycles\n";
-		// Assume the process executes for a quantum cycle
-		process->execute();
-		if (!process->isFinished()) { // If the process is not finished
-			readyQueue.push(process); // Add the process back to the queue
-		}
-	}
+	if (processQueues.empty()) return;
 }
 
 void Scheduler::generateProcess(int& ID, int instructionCount) {
