@@ -195,8 +195,39 @@ void Scheduler::scheduleSJF() {
 	readyQueues[bestCore].push(process);
 }
 
+// Same scheduling scheme as FCFS but without sorting
 void Scheduler::scheduleRR() {
 	if (processQueues.empty()) return;
+
+	auto process = processQueues.front();
+	processQueues.pop();
+
+	// check if there is an open core
+	for (int core = 0; core < numCores; core++) {
+		if (readyQueues[core].empty()) {
+			process->setCore(core);
+			readyQueues[core].push(process);
+			return;
+		}
+	}
+
+	// check for most available core
+	int lowestQueue = 0;
+	int bestCore = 0;
+	for (int core = 0; core < numCores; core++) {
+		if (core == 0) {
+			lowestQueue = readyQueues[core].size();
+			bestCore = core;
+		}
+		else {
+			if (readyQueues[core].size() < lowestQueue) {
+				bestCore = core;
+			}
+		}
+	}
+
+	process->setCore(bestCore);
+	readyQueues[bestCore].push(process);
 }
 
 void Scheduler::generateProcess(int& ID, int instructionCount) {
