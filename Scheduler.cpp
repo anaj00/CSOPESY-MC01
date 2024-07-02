@@ -187,34 +187,33 @@ void Scheduler::scheduleSJF() {
     while (running) {
         std::lock_guard<std::mutex> lock(queueMutex);
         if (!readyQueue.empty()) {
-            std::sort(processes.begin(), processes.end(), [](const std::shared_ptr<Process>& a, const std::shared_ptr<Process>& b) {
+
+            // Sort the ready queue by total instructions
+            std::vector<std::shared_ptr<Process>> sortedProcesses;
+            while (!readyQueue.empty()) {
+                sortedProcesses.push_back(readyQueue.front());
+                readyQueue.pop();
+            }
+            std::sort(sortedProcesses.begin(), sortedProcesses.end(), [](const std::shared_ptr<Process>& a, const std::shared_ptr<Process>& b) {
                 return a->getTotalInstructions() < b->getTotalInstructions();
                 });
 
-            auto process = readyQueue.front();
-            readyQueue.pop();
+            // Assign sorted processes to available cores
+            for (auto& process : sortedProcesses) {
+                auto coreID = getAvailableCoreWorkerID();
 
-            auto coreID = getAvailableCoreWorkerID();
+                if (coreID > 0) {
+                    process->setCore(coreID);
+                    cores[coreID - 1]->setProcess(process);
 
-            if (coreID > 0) {
-                process->setCore(coreID);
-                cores[coreID - 1]->setProcess(process);
-
-                while (!process->isFinished()) {
-                    cores[coreID - 1]->runProcess();
-                    std::this_thread::sleep_for(std::chrono::milliseconds(configManager->getDelayPerExec() * 1000));
+                    std::thread([this, process, coreID]() {
+                        cores[coreID - 1]->runProcess();
+                        initializeFinishedProcess(process, coreID);
+                        }).detach();
                 }
-                initializeFinishedProcess(process, coreID);
-            }
-            else {
-                // No available core, put the process back at the front of the queue
-                std::queue<std::shared_ptr<Process>> tempQueue;
-                tempQueue.push(process);
-                while (!readyQueue.empty()) {
-                    tempQueue.push(readyQueue.front());
-                    readyQueue.pop();
+                else {
+                    readyQueue.push(process); // Put back in the ready queue if no core is available
                 }
-                readyQueue = tempQueue;
             }
         }
     }
