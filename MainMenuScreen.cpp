@@ -63,7 +63,7 @@ void MainMenuScreen::handleCommand(string command) {
 
         } else if (command.substr(0,6) == "screen") {
             if (command == "screen -ls") {
-                consoleManager.getAllProcesses();
+                consoleManager.displayStatus();
             }
 
             else if (command.substr(0,9) == "screen -s") {
@@ -73,13 +73,9 @@ void MainMenuScreen::handleCommand(string command) {
 
         } else if (command.substr(0, 9) == "scheduler") {
             if (command.substr(10) == "test") {
-                std::cout << "in test" << std::endl;
-                //TODO: start scheduler test function
                 consoleManager.startSchedulerTest();
             }
             else if (command.substr(10) == "stop") {
-                std::cout << "in stop" << std::endl;
-                //TODO: stop scheduler test function
                 consoleManager.stopSchedulerTest();
             } else {
                 std::cout << "Invalid command.Please try again." << std::endl;

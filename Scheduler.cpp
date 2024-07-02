@@ -1,247 +1,285 @@
+#include "Scheduler.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <thread>
+#include <windows.h>
+#include <iomanip>
+#include <optional>
 
-#include "Scheduler.h"
+Scheduler::Scheduler() : running(false), isTestRunning(false) {}
 
-Scheduler::Scheduler() {}
-
-Scheduler::~Scheduler() {}
+Scheduler::~Scheduler() {
+    stop();
+    if (schedulerThread.joinable()) {
+        schedulerThread.join();
+    }
+    for (auto& core : cores) {
+        core->stop();
+    }
+}
 
 void Scheduler::addProcess(const Process& process) {
-	processes.push_back(std::make_shared<Process>(process));
-	processQueues.push(std::make_shared<Process>(process));
+    std::lock_guard<std::mutex> lock(processMutex);
+    auto newProcess = std::make_shared<Process>(process);
+    processes.push_back(newProcess);
+
+    std::lock_guard<std::mutex> queueLock(queueMutex);
+    readyQueue.push(newProcess);
 }
+
 
 std::shared_ptr<Process> Scheduler::getProcessByName(const std::string& name) {
-	for (auto& process : processes) {
-		if (process->getName() == name) {
-			return process;
-		}
-	}
-	return nullptr;
-}
-
-void Scheduler::getAllProcesses() {
-	std::cout << "-------------------------------" << std::endl;
-	std::cout << "CPU utilization: " << std::endl;
-	std::cout << "Cores used: " << std::endl;
-	std::cout << "Cores available: " << std::endl << std::endl;
-
-	std::cout << "Finished: " << std::endl << std::endl;
-	for (auto& process : processes) {
-		if (process->isFinished()) {
-			std::cout << process->getName() << std::endl;
-		} 
-	}
-	
-	std::cout << std::endl;
-
-	std::cout << "Not finished: " << std::endl;
-	for (auto& process : processes) {
-		if (process -> isFinished() == false) {
-			std::cout << process->getName() << std::endl;
-		}
-	}
+    std::lock_guard<std::mutex> lock(processMutex);
+    for (auto& process : processes) {
+        if (process->getName() == name) {
+            return process;
+        }
+    }
+    return nullptr;
 }
 
 bool Scheduler::initialize(ConfigurationManager* newConfigManager) {
-	try {
-		configManager = newConfigManager;
-		running = true;
-		numCores = configManager->getNumCPU();
-		return true;
+    try {
+        configManager = newConfigManager;
+        initializeCoreWorkers();
+        running = true;
+        return true;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error initializing scheduler: " << e.what() << std::endl;
+        return false;
+    }
+}
 
-	}
-	catch (const std::exception& e) {
-		std::cerr << "Error initializing scheduler: " << e.what() << std::endl;
-		return false;
-	}
+void Scheduler::initializeCoreWorkers() {
+    for (int i = 0; i < configManager->getNumCPU(); i++) {
+        cores.emplace_back(std::make_unique<CoreWorker>(i + 1));
+        cores.back()->start();
+    }
 }
 
 void Scheduler::run() {
-	// TODO: make this into multi core implementation
-	std::cout << configManager -> getSchedulerAlgorithm() << std::endl;
-	while (running) {
-		if (configManager->getSchedulerAlgorithm() == "fcfs") {
-			scheduleFCFS();
-		}
+    schedulerThread = std::thread(&Scheduler::schedulerLoop, this);
+}
 
-		else if (configManager->getSchedulerAlgorithm() == "sjf") {
-			scheduleSJF();
-		}
-
-		else if (configManager->getSchedulerAlgorithm() == "rr") {
-			scheduleRR();
-		}
-		
-		std::this_thread::sleep_for(std::chrono::milliseconds(configManager->getDelayPerExec() * 1000));
-	}
+void Scheduler::schedulerLoop() {
+    while (running) {
+        if (configManager->getSchedulerAlgorithm() == "fcfs") {
+            scheduleFCFS();
+        }
+        else if (configManager->getSchedulerAlgorithm() == "sjf") {
+            scheduleSJF();
+        }
+        else if (configManager->getSchedulerAlgorithm() == "rr") {
+            scheduleRR();
+        }
+    }
 }
 
 void Scheduler::stop() {
-	running = false;
+    running = false;
 }
 
-void Scheduler::displayStatus() const {
-	std::cout << "Status" << std::endl;
-
-	// TODO: Add status data here
+void Scheduler::setConsoleColor(WORD attributes) {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, attributes);
 }
 
-void Scheduler::saveReport() const {
-	std::cout << "Saving report..." << std::endl;
+void Scheduler::printProcessList() {
+    setConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+    std::cout << "| Processes:                                                     |" << std::endl;
+    std::cout << "|  ID   Process Name       Current Instruction   Total Instruction   Core |" << std::endl;
+    std::cout << "|====================================================================|" << std::endl;
+    for (const auto& process : processes) {
+        std::cout << "|  " << std::setw(0) << process->getID()
+            << "   " << std::setw(10) << process->getName()
+            << "   " << std::setw(15) << process->getCurrentInstruction()
+            << "   " << std::setw(18) << process->getTotalInstructions()
+            << "   " << std::setw(4) << process->getCore()
+            << " |" << std::endl;
+    }
+    std::cout << "+-----------------------------------------------------------------------------+" << std::endl;
+    setConsoleColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+}
 
-	std::ofstream file("csopesy-log.txt");
-	if (!file) {
-		std::cerr << "Error opening file." << std::endl;
-		return;
-	}
+void Scheduler::displayStatus() {
+    printProcessList();
+}
 
-	// TODO: Add report data here
+void Scheduler::saveReport() {
+    std::cout << "Saving report..." << std::endl;
+
+    std::ofstream file("csopesy-log.txt");
+    if (!file) {
+        std::cerr << "Error opening file." << std::endl;
+        return;
+    }
+
+    // TODO: Add report data here
 }
 
 void Scheduler::startSchedulerTest(int& ID, std::function<int()> getRandomInstruction) {
-	// TODO: generate function every x seconds
-	// Set looping condition to true if turned off. 
-	if (!isTestRunning) {
-		isTestRunning = true;
-	}
-	while (isTestRunning) {
-		// generate function
-		int instructionCount = getRandomInstruction();
-		generateProcess(ID, instructionCount);
-		// wait 
-		std::this_thread::sleep_for(std::chrono::milliseconds(configManager->getBatchProcessFrequency() * 1000));
-	}
-	
+    if (!isTestRunning) {
+        isTestRunning = true;
+    }
+    while (isTestRunning) {
+        int instructionCount = getRandomInstruction();
+        generateProcess(ID, instructionCount);
+        std::this_thread::sleep_for(std::chrono::milliseconds(configManager->getBatchProcessFrequency() * 1000));
+    }
 }
-
 
 void Scheduler::stopSchedulerTest() {
-	isTestRunning = false;
-	processTestIteration++;
+    isTestRunning = false;
+    processTestIteration++;
 }
 
+int Scheduler::getAvailableCoreWorkerID() {
+    for (auto& core : cores) {
+        if (core->isAvailable()) {
+            return core->getID();
+        }
+    }
+    return 0;
+}
+
+void Scheduler::initializeFinishedProcess(std::shared_ptr<Process> process, int CoreWorkerID) {
+    cores[CoreWorkerID - 1]->finishProcess();
+    finishedProcesses.push_back(process);
+}
 
 void Scheduler::scheduleFCFS() {
-	if (processQueues.empty()) return;
+    while (running) {
+        std::lock_guard<std::mutex> lock(queueMutex);
+        if (!readyQueue.empty()) {
 
-	auto process = processQueues.front();
-	processQueues.pop();
-	
-	process->setCore(fcfsCoreTracker);
-	readyQueues[fcfsCoreTracker].push(process);
+            auto process = readyQueue.front();
+            readyQueue.pop();
 
-	std::cout << process->getCore() << std::endl;
-	if (fcfsCoreTracker + 1 == numCores) {
-		fcfsCoreTracker = 0;
-	}
-	else {
-		fcfsCoreTracker++;
-	}
+            auto coreID = getAvailableCoreWorkerID();
+
+            if (coreID > 0) {
+                process->setCore(coreID);
+                cores[coreID - 1]->setProcess(process);
+
+                std::thread([this, process, coreID]() {
+                    cores[coreID - 1]->runProcess();
+                    initializeFinishedProcess(process, coreID);
+                    }).detach();
+            }
+            else {
+                // No available core, put the process back at the front of the queue
+                std::queue<std::shared_ptr<Process>> tempQueue;
+                tempQueue.push(process);
+                while (!readyQueue.empty()) {
+                    tempQueue.push(readyQueue.front());
+                    readyQueue.pop();
+                }
+                readyQueue = tempQueue;
+            }
+        }
+    }
 }
+
 
 void Scheduler::scheduleSJF() {
-	if (processQueues.empty()) return;
-	// sort process queues on lowest totalInstruction
-	if (processQueues.size() > 1) {
-		std::vector<std::shared_ptr<Process>> processVector;
+    while (running) {
+        std::lock_guard<std::mutex> lock(queueMutex);
+        if (!readyQueue.empty()) {
+            std::sort(processes.begin(), processes.end(), [](const std::shared_ptr<Process>& a, const std::shared_ptr<Process>& b) {
+                return a->getTotalInstructions() < b->getTotalInstructions();
+                });
 
-		// Transfer elements from queue to vector
-		while (!processQueues.empty()) {
-			processVector.push_back(processQueues.front());
-			processQueues.pop();
-		}
+            auto process = readyQueue.front();
+            readyQueue.pop();
 
-		// Sort the vector based on the total instructions of the processes
-		std::sort(processVector.begin(), processVector.end(), [](const std::shared_ptr<Process>& a, const std::shared_ptr<Process>& b) {
-			return a->getTotalInstructions() < b->getTotalInstructions();
-			});
+            auto coreID = getAvailableCoreWorkerID();
 
-		// Transfer elements back from vector to queue
-		for (const auto& process : processVector) {
-			processQueues.push(process);
-		}
-	}
+            if (coreID > 0) {
+                process->setCore(coreID);
+                cores[coreID - 1]->setProcess(process);
 
-	auto process = processQueues.front();
-	processQueues.pop();
-
-	// check if there is an open core
-	for (int core = 0; core < numCores; core++) {
-		if (readyQueues[core].empty()) {
-			process->setCore(core);
-			readyQueues[core].push(process);
-			return;
-		} 
-	}
-
-	// check for most available core
-	int lowestQueue = 0;
-	int bestCore = 0;
-	for (int core = 0; core < numCores; core++) {
-		if (core == 0) {
-			lowestQueue = readyQueues[core].size();
-			bestCore = core;
-		} else {
-			if (readyQueues[core].size() < lowestQueue) {
-				bestCore = core;
-			}
-		}
-	}
-	process->setCore(bestCore);
-	readyQueues[bestCore].push(process);
+                while (!process->isFinished()) {
+                    cores[coreID - 1]->runProcess();
+                    std::this_thread::sleep_for(std::chrono::milliseconds(configManager->getDelayPerExec() * 1000));
+                }
+                initializeFinishedProcess(process, coreID);
+            }
+            else {
+                // No available core, put the process back at the front of the queue
+                std::queue<std::shared_ptr<Process>> tempQueue;
+                tempQueue.push(process);
+                while (!readyQueue.empty()) {
+                    tempQueue.push(readyQueue.front());
+                    readyQueue.pop();
+                }
+                readyQueue = tempQueue;
+            }
+        }
+    }
 }
 
-// Same scheduling scheme as FCFS but without sorting
+
+
 void Scheduler::scheduleRR() {
-	if (processQueues.empty()) return;
+    while (running) {
+        std::lock_guard<std::mutex> lock(queueMutex);
+        if (!readyQueue.empty()) {
+            auto process = readyQueue.front();
+            readyQueue.pop();
 
-	auto process = processQueues.front();
-	processQueues.pop();
+            auto coreID = getAvailableCoreWorkerID();
 
-	// check if there is an open core
-	for (int core = 0; core < numCores; core++) {
-		if (readyQueues[core].empty()) {
-			process->setCore(core);
-			readyQueues[core].push(process);
-			return;
-		}
-	}
+            if (coreID > 0) {
+                process->setCore(coreID);
+                cores[coreID - 1]->setProcess(process);
 
-	// check for most available core
-	int lowestQueue = 0;
-	int bestCore = 0;
-	for (int core = 0; core < numCores; core++) {
-		if (core == 0) {
-			lowestQueue = readyQueues[core].size();
-			bestCore = core;
-		}
-		else {
-			if (readyQueues[core].size() < lowestQueue) {
-				bestCore = core;
-			}
-		}
-	}
+                int quantum = configManager->getQuantumCycles();
+                while (quantum > 0 && !process->isFinished()) {
+                    cores[coreID - 1]->runProcess();
+                    quantum--;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(configManager->getDelayPerExec() * 1000));
+                }
 
-	process->setCore(bestCore);
-	readyQueues[bestCore].push(process);
+                if (!process->isFinished()) {
+                    // Put back at the front of the queue if not finished
+                    std::queue<std::shared_ptr<Process>> tempQueue;
+                    tempQueue.push(process);
+                    while (!readyQueue.empty()) {
+                        tempQueue.push(readyQueue.front());
+                        readyQueue.pop();
+                    }
+                    readyQueue = tempQueue;
+                }
+                else {
+                    initializeFinishedProcess(process, coreID);
+                }
+            }
+            else {
+                // No available core, put the process back at the front of the queue
+                std::queue<std::shared_ptr<Process>> tempQueue;
+                tempQueue.push(process);
+                while (!readyQueue.empty()) {
+                    tempQueue.push(readyQueue.front());
+                    readyQueue.pop();
+                }
+                readyQueue = tempQueue;
+            }
+        }
+    }
 }
 
-void Scheduler::generateProcess(int& ID, int instructionCount) {
-	std::string processName = "SchedTest";
-	processName.append("_" + std::to_string(processTestIteration));
-	processName.append("_" + std::to_string(processTestNumber));
 
 
-	Process newProcess(processName, ID, instructionCount);
-	addProcess(newProcess);
+void Scheduler::generateProcess(int& id, int instructionCount) {
+    std::string processName = "SchedTest";
+    processName.append("_" + std::to_string(processTestIteration));
+    processName.append("_" + std::to_string(processTestNumber));
 
-	ID++;
-	processTestNumber++;
+    Process newProcess(processName, id, instructionCount);
+    addProcess(newProcess);
+
+    id++;
+    processTestNumber++;
 }
-
-
-

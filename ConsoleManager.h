@@ -33,7 +33,7 @@ public:
 	void startSchedulerTest();
 	void stopSchedulerTest();
 	
-	void getAllProcesses();
+	void displayStatus();
 
 private:
 	ConfigurationManager configManager; // Configuration manager object

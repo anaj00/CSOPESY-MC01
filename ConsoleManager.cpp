@@ -124,6 +124,6 @@ void ConsoleManager::stopSchedulerTest() {
 	scheduler.stopSchedulerTest();
 }
 
-void ConsoleManager::getAllProcesses() {
-	scheduler.getAllProcesses();	
+void ConsoleManager::displayStatus() {
+	scheduler.displayStatus();	
 }

@@ -4,50 +4,62 @@
 #include <memory>
 #include <queue>
 #include <functional>
+#include <thread>
+#include <mutex>
+#include <windows.h>
 
 #include "Process.h"
 #include "ConfigurationManager.h"
-
+#include "CoreWorker.h"
 
 class Scheduler
 {
 public:
-	Scheduler();
-	~Scheduler();
+    Scheduler();
+    ~Scheduler();
 
-	void addProcess(const Process& process);
-	std::shared_ptr<Process> getProcessByName(const std::string& name);
-	void getAllProcesses();
+    void addProcess(const Process& process);
+    std::shared_ptr<Process> getProcessByName(const std::string& name);
+    void printProcessList();
 
-	bool initialize(ConfigurationManager* newConfigManager);
-	void run();
-	void stop();
-	void displayStatus() const;
-	void saveReport() const;
-	void startSchedulerTest(int& ID, std::function<int()> getRandomInstruction);
-	void stopSchedulerTest();
+    bool initialize(ConfigurationManager* newConfigManager);
+    void run();
+    void stop();
+
+    void displayStatus();
+    void saveReport();
+
+    void startSchedulerTest(int& ID, std::function<int()> getRandomInstruction);
+    void stopSchedulerTest();
 
 private:
-	ConfigurationManager* configManager;
-	// TODO: change implementation of process queues
-	std::vector<std::shared_ptr<Process>> processes; // All processes regardless of state
-	std::vector<std::queue<std::shared_ptr<Process>>> readyQueues; // All processes ready to go once a thread yields
-	std::vector<Process> finishedProcesses; // Add finished processes here
-	std::queue<std::shared_ptr<Process>> processQueues; // holder for processes not yet in rq
+    ConfigurationManager* configManager;
 
+    std::vector<std::unique_ptr<CoreWorker>> cores; // All cores
+    std::vector<std::shared_ptr<Process>> processes; // All processes regardless of state
+    std::queue<std::shared_ptr<Process>> readyQueue; // All processes ready to go once a thread yields
+    std::vector<std::shared_ptr<Process>> finishedProcesses; // Add finished processes here
+    std::mutex processMutex; // Protects access to the processes vector
+    std::mutex queueMutex;   // Protects access to the readyQueue
 
-	void scheduleFCFS();
-	void scheduleSJF();
-	void scheduleRR();
-	void generateProcess(int& ID, int instructionCount);
-	
-	bool running = false;
-	bool isTestRunning = true;
-	
-	int processTestNumber = 0;
-	int processTestIteration = 0; 
-	int numCores;
-	int fcfsCoreTracker = 0;
+    bool running;
+    bool isTestRunning;
 
+    void initializeCoreWorkers();
+    int getAvailableCoreWorkerID();
+    void initializeFinishedProcess(std::shared_ptr<Process> process, int CoreWorkerID);
+
+    void scheduleFCFS();
+    void scheduleSJF();
+    void scheduleRR();
+
+    void generateProcess(int& ID, int instructionCount);
+
+    void setConsoleColor(WORD attributes);
+
+    std::thread schedulerThread;
+    void schedulerLoop();
+
+    int processTestNumber = 0;
+    int processTestIteration = 0;
 };
-

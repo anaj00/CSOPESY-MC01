@@ -1,4 +1,5 @@
 #include "Process.h"
+#include <iostream>
 
 Process::Process(std::string name, int id, int numInstructions) 
 	: processName(name), id(id), currentInstruction(0), totalInstructions(numInstructions), finished(false) {}
@@ -18,6 +19,7 @@ int Process::getCurrentInstruction() const {
 int Process::getTotalInstructions() const {
 	return totalInstructions;
 }
+
 int Process::getCore() {
 	return core;
 }
