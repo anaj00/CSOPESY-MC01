@@ -26,7 +26,7 @@ void MainMenuScreen::display(){
 void MainMenuScreen::process() {
     string command;
     while (true) {
-        std::cout << "> ";
+        std::cout << "root:\\> ";
         getline(cin, command);
         handleCommand(command);
         std::cout << endl;
@@ -43,7 +43,7 @@ void MainMenuScreen::displayHeader(){
                              \/        \/         \/                 \/        \/  \/       
     )" << endl;
 
-    std::cout << "Hello. Welcome to CSOPESY command line interface.\n";
+    std::cout << "Hello. Welcome to CSOPESY command line interface." << endl << endl;
 }
 
 void MainMenuScreen::handleCommand(string command) {
@@ -80,7 +80,21 @@ void MainMenuScreen::handleCommand(string command) {
             } else {
                 std::cout << "Invalid command.Please try again." << std::endl;
             }
-        }
+        } else if (command == "report-util") {
+            consoleManager.getScheduler().saveReport();
+
+		} else if (command == "help") {
+			std::cout << "\nCommands:" << std::endl;
+			std::cout << "clear/cls - Clear the screen" << std::endl;
+			std::cout << "marquee - Switch to marquee screen" << std::endl;
+			std::cout << "screen -ls - List all screens" << std::endl;
+			std::cout << "screen -s [processName] - Create a new process screen" << std::endl;
+			std::cout << "scheduler test - Start the scheduler test" << std::endl;
+			std::cout << "scheduler stop - Stop the scheduler test" << std::endl;
+			std::cout << "report-util - Save the report" << std::endl;
+			std::cout << "exit - Exit the program" << std::endl;
+		}
+
         else {
             std::cout << "Invalid command. Please try again." << std::endl;
         }

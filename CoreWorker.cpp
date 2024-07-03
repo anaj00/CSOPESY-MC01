@@ -67,6 +67,11 @@ bool CoreWorker::isAvailable() {
     return !processAssigned;
 }
 
+bool CoreWorker::isAssignedProcess() {
+	std::lock_guard<std::mutex> lock(coreMutex);
+	return processAssigned;
+}
+
 int CoreWorker::getID() {
     return id;
 }

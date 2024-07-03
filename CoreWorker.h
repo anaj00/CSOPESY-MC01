@@ -18,6 +18,7 @@ public:
     void finishProcess();
 
     bool isAvailable();
+	bool isAssignedProcess();
     int getID();
 
     void start();

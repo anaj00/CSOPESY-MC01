@@ -1,0 +1,17 @@
+CPU utilization: 75%
+Cores used: 3
+Cores available: 1
+--------------------------------------------
+Running processes:
+Process             Creation Time                 Core           Progress       
+SchedTest_0_4       07/04/2024 06:52:17AM         Core: 1    890   / 1398
+SchedTest_0_5       07/04/2024 06:52:19AM         Core: 4    275   / 1286
+SchedTest_0_6       07/04/2024 06:52:21AM         Core: 2    143   / 1728
+
+Finished processes:
+Process             Creation Time                 Core           Progress       
+SchedTest_0_0       07/04/2024 06:52:08AM         Core: 1    1045  / 1045
+SchedTest_0_1       07/04/2024 06:52:10AM         Core: 2    1663  / 1663
+SchedTest_0_2       07/04/2024 06:52:12AM         Core: 3    1647  / 1647
+SchedTest_0_3       07/04/2024 06:52:15AM         Core: 4    1273  / 1273
+--------------------------------------------

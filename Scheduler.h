@@ -54,8 +54,6 @@ private:
 
     void generateProcess(int& ID, int instructionCount);
 
-    void setConsoleColor(WORD attributes);
-
     std::thread schedulerThread;
     void schedulerLoop();
 

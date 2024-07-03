@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <optional>
 
+
 Scheduler::Scheduler() : running(false), isTestRunning(false) {}
 
 Scheduler::~Scheduler() {
@@ -91,31 +92,56 @@ void Scheduler::stop() {
     running = false;
 }
 
-void Scheduler::setConsoleColor(WORD attributes) {
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hConsole, attributes);
-}
-
-void Scheduler::printProcessList() {
-    setConsoleColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-    std::cout << "| Processes:                                                     |" << std::endl;
-    std::cout << "|  ID   Process Name       Current Instruction   Total Instruction   Core |" << std::endl;
-    std::cout << "|====================================================================|" << std::endl;
-    for (const auto& process : processes) {
-        std::cout << "|  " << std::setw(0) << process->getID()
-            << "   " << std::setw(10) << process->getName()
-            << "   " << std::setw(15) << process->getCurrentInstruction()
-            << "   " << std::setw(18) << process->getTotalInstructions()
-            << "   " << std::setw(4) << process->getCore()
-            << " |" << std::endl;
-    }
-    std::cout << "+-----------------------------------------------------------------------------+" << std::endl;
-    setConsoleColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-}
+//void Scheduler::setConsoleColor(WORD attributes) {
+//    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+//    SetConsoleTextAttribute(hConsole, attributes);
+//}
 
 void Scheduler::displayStatus() {
-    printProcessList();
+    std::lock_guard<std::mutex> lock(processMutex);
+
+    int coresUsed = 0;
+    for (const auto& core : cores) {
+        if (core->isAssignedProcess()) {
+            coresUsed++;
+        }
+    }
+
+    int totalCores = cores.size();
+    int cpuUtilization = totalCores ? (coresUsed * 100 / totalCores) : 0;
+
+    std::cout << "CPU utilization: " << cpuUtilization << "%\n";
+    std::cout << "Cores used: " << coresUsed << "\n";
+    std::cout << "Cores available: " << totalCores - coresUsed << "\n";
+    std::cout << "--------------------------------------------\n";
+
+    std::cout << "Running processes:\n";
+
+    for (const auto& process : processes) {
+        if (!process->isFinished()) {
+            std::cout << std::left << std::setw(20) << process->getName()
+                << std::left << std::setw(30) << process->getCreationTime()
+                << "Core:   " << std::setw(15) << process->getCore()
+                << std::left << std::setw(1) << process->getCurrentInstruction() << " / "
+                << process->getTotalInstructions() << "\n";
+        }
+    }
+
+    std::cout << "\nFinished processes:\n";
+
+    for (const auto& process : processes) {
+        if (process->isFinished()) {
+            std::cout << std::left << std::setw(20) << process->getName()
+                << std::left << std::setw(30) << process->getCreationTime()
+                << "Core:   " << std::setw(15) << process->getCore()
+                << std::left << std::setw(1) << process->getCurrentInstruction() << " / "
+                << process->getTotalInstructions() << "\n";
+        }
+    }
+
+    std::cout << "--------------------------------------------\n";
 }
+
 
 void Scheduler::saveReport() {
     std::cout << "Saving report..." << std::endl;
@@ -126,8 +152,66 @@ void Scheduler::saveReport() {
         return;
     }
 
-    // TODO: Add report data here
+    std::lock_guard<std::mutex> lock(processMutex);
+
+    int coresUsed = 0;
+    for (const auto& core : cores) {
+        if (core->isAssignedProcess()) {
+            coresUsed++;
+        }
+    }
+
+    int totalCores = cores.size();
+    int cpuUtilization = totalCores ? (coresUsed * 100 / totalCores) : 0;
+
+    file << "CPU utilization: " << cpuUtilization << "%\n";
+    file << "Cores used: " << coresUsed << "\n";
+    file << "Cores available: " << totalCores - coresUsed << "\n";
+    file << "--------------------------------------------\n";
+
+    file << "Running processes:\n";
+
+    // Column headers
+    file << std::left << std::setw(20) << "Process"
+        << std::left << std::setw(30) << "Creation Time"
+        << std::left << std::setw(15) << "Core"
+        << std::left << std::setw(15) << "Progress" << "\n";
+
+    for (const auto& process : processes) {
+        if (!process->isFinished()) {
+            file << std::left << std::setw(20) << process->getName()
+                << std::left << std::setw(30) << process->getCreationTime()
+                << "Core: " << std::setw(5) << process->getCore()
+                << std::left << std::setw(5) << process->getCurrentInstruction() << " / "
+                << process->getTotalInstructions() << "\n";
+        }
+    }
+
+    file << "\nFinished processes:\n";
+
+    // Column headers
+    file << std::left << std::setw(20) << "Process"
+        << std::left << std::setw(30) << "Creation Time"
+        << std::left << std::setw(15) << "Core"
+        << std::left << std::setw(15) << "Progress" << "\n";
+
+    for (const auto& process : processes) {
+        if (process->isFinished()) {
+            file << std::left << std::setw(20) << process->getName()
+                << std::left << std::setw(30) << process->getCreationTime()
+                << "Core: " << std::setw(5) << process->getCore()
+                << std::left << std::setw(5) << process->getCurrentInstruction() << " / "
+                << process->getTotalInstructions() << "\n";
+        }
+    }
+
+    file << "--------------------------------------------\n";
+
+    file.close();
+
+    std::cout << "Report saved to csopesy-log.txt" << std::endl;
 }
+
 
 void Scheduler::startSchedulerTest(int& ID, std::function<int()> getRandomInstruction) {
     if (!isTestRunning) {
