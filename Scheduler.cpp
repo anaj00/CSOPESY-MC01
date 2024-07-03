@@ -220,7 +220,6 @@ void Scheduler::scheduleRR() {
     while (running) {
         std::lock_guard<std::mutex> lock(queueMutex);
         if (!readyQueue.empty()) {
-
             auto process = readyQueue.front();
             readyQueue.pop();
 
@@ -229,15 +228,28 @@ void Scheduler::scheduleRR() {
             if (coreID > 0) {
                 process->setCore(coreID);
                 cores[coreID - 1]->setProcess(process);
+
+                // Use a lambda function to handle requeueing the process after execution
+                cores[coreID - 1]->setProcessCompletionCallback([this](std::shared_ptr<Process> completedProcess) {
+                    if (!completedProcess->isFinished()) {
+                        std::lock_guard<std::mutex> queueLock(this->queueMutex);
+                        this->readyQueue.push(completedProcess);
+                    }
+                    else {
+                        std::lock_guard<std::mutex> processLock(this->processMutex);
+                        this->finishedProcesses.push_back(completedProcess);
+                    }
+                    });
             }
             else {
                 // No available core, put the process back at the front of the queue
                 readyQueue.push(process);
             }
-
         }
     }
 }
+
+
 
 
 

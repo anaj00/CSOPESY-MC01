@@ -27,24 +27,34 @@ void CoreWorker::runProcess() {
     if (quantumSlice == 0) {
         while (currentProcess && !currentProcess->isFinished()) {
             currentProcess->execute();
-            std::this_thread::sleep_for(std::chrono::milliseconds(delayPerExec)); 
+            std::this_thread::sleep_for(std::chrono::milliseconds(delayPerExec));
         }
 
         if (currentProcess && currentProcess->isFinished()) {
             finishProcess();
         }
     }
-
     else {
         for (int i = 0; i < quantumSlice; i++) {
+            if (currentProcess->isFinished()) {
+                finishProcess();
+                return;
+            }
             currentProcess->execute();
             std::this_thread::sleep_for(std::chrono::milliseconds(delayPerExec));
         }
 
-        finishProcess();
+        // Process is not finished, notify Scheduler
+        if (processCompletionCallback) {
+            processCompletionCallback(currentProcess);
+        }
+
+        // Reset the current process to ensure it gets requeued
+        currentProcess.reset();
+        processAssigned = false;
     }
-    
 }
+
 
 void CoreWorker::finishProcess() {
     std::lock_guard<std::mutex> lock(coreMutex);
@@ -89,4 +99,9 @@ void CoreWorker::run() {
             runProcess();
         }
     }
+}
+
+void CoreWorker::setProcessCompletionCallback(std::function<void(std::shared_ptr<Process>)> callback) {
+    std::lock_guard<std::mutex> lock(coreMutex);
+    processCompletionCallback = callback;
 }
