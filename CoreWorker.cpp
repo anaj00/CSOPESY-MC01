@@ -1,13 +1,20 @@
 #include "CoreWorker.h"
+
 #include <iostream>
 
-CoreWorker::CoreWorker(int id) : id(id), running(false), processAssigned(false) {}
+CoreWorker::CoreWorker(int id, int delayPerExec, int quantumSlice) 
+    : id(id), delayPerExec(delayPerExec), quantumSlice(quantumSlice), running(false), processAssigned(false) {}
 
 CoreWorker::~CoreWorker() {
     stop();
     if (coreThread.joinable()) {
         coreThread.join();
     }
+}
+
+std::shared_ptr<Process> CoreWorker::getCurrentProcess() {
+	std::lock_guard<std::mutex> lock(coreMutex);
+	return currentProcess;
 }
 
 void CoreWorker::setProcess(std::shared_ptr<Process> process) {
@@ -17,13 +24,26 @@ void CoreWorker::setProcess(std::shared_ptr<Process> process) {
 }
 
 void CoreWorker::runProcess() {
-    while (currentProcess && !currentProcess->isFinished()) {
-        currentProcess->execute();
-        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Adjust the sleep duration as needed
+    if (quantumSlice == 0) {
+        while (currentProcess && !currentProcess->isFinished()) {
+            currentProcess->execute();
+            std::this_thread::sleep_for(std::chrono::milliseconds(delayPerExec)); 
+        }
+
+        if (currentProcess && currentProcess->isFinished()) {
+            finishProcess();
+        }
     }
-    if (currentProcess && currentProcess->isFinished()) {
+
+    else {
+        for (int i = 0; i < quantumSlice; i++) {
+            currentProcess->execute();
+            std::this_thread::sleep_for(std::chrono::milliseconds(delayPerExec));
+        }
+
         finishProcess();
     }
+    
 }
 
 void CoreWorker::finishProcess() {
@@ -65,9 +85,8 @@ void CoreWorker::run() {
             }
         }
 
-        if (processAssigned && currentProcess) {
+        if (processAssigned) {
             runProcess();
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Adjust the sleep duration as needed
     }
 }

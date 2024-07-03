@@ -90,10 +90,11 @@ void ConsoleManager::createProcessScreen(const std::string processName) {
 	std::cout << newProcess.getName() << "\n";
 	std::cout << newProcess.getID() << "\n";
 	std::cout << newProcess.getTotalInstructions() << "\n";
-	scheduler.addProcess(newProcess);
+	
+	std::shared_ptr<Process> processPointer = scheduler.addProcess(newProcess);
 
 	// Create new process screen
-	auto processScreen = std::make_shared<ProcessScreen>(newProcess);
+	auto processScreen = std::make_shared<ProcessScreen>(processPointer);
 
 	// Add process screen to console manager
 	addConsole(processScreen);

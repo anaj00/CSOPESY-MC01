@@ -18,7 +18,7 @@ public:
     Scheduler();
     ~Scheduler();
 
-    void addProcess(const Process& process);
+    std::shared_ptr<Process> addProcess(const Process& process);
     std::shared_ptr<Process> getProcessByName(const std::string& name);
     void printProcessList();
 
@@ -47,7 +47,6 @@ private:
 
     void initializeCoreWorkers();
     int getAvailableCoreWorkerID();
-    void initializeFinishedProcess(std::shared_ptr<Process> process, int CoreWorkerID);
 
     void scheduleFCFS();
     void scheduleSJF();

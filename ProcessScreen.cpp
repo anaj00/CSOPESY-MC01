@@ -5,8 +5,8 @@
 
 extern ConsoleManager consoleManager;
 
-ProcessScreen::ProcessScreen(Process myProcess)
-	: AConsole("PROCESS_SCREEN_" + myProcess.getName()), thisProcess(myProcess) {
+ProcessScreen::ProcessScreen(std::shared_ptr<Process> myProcess)
+	: AConsole("PROCESS_SCREEN_" + myProcess->getName()), thisProcess(myProcess) {
 }
 
 void ProcessScreen::onExecute() {
@@ -31,14 +31,16 @@ void ProcessScreen::process() {
 }
 
 void ProcessScreen::displayHeader() {
+    std::cout << "--------------------------" << endl;
     // Displays process name and ID
-    std::cout << "Process: " << thisProcess.getName() << endl;
-    std::cout << "ID: " << thisProcess.getID() << endl << endl;
+    std::cout << "Process: " << thisProcess->getName() << endl;
+    std::cout << "ID: " << thisProcess->getID() << endl << endl;
 
     // Prints finished if process is done else print current line and total lines
-    if (!thisProcess.isFinished()) {
-        std::cout << "Current instruction line: " << thisProcess.getCurrentInstruction() << endl;
-        std::cout << "Lines of code: " << thisProcess.getTotalInstructions() << endl << endl;
+    if (!thisProcess->isFinished()) {
+        std::cout << "Current instruction line: " << thisProcess->getCurrentInstruction() << endl;
+        std::cout << "Lines of code: " << thisProcess->getTotalInstructions() << endl;
+        std::cout << "--------------------------" << endl;
     }
     else {
         std::cout << "Finished!" << endl;

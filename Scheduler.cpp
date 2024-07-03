@@ -19,13 +19,15 @@ Scheduler::~Scheduler() {
     }
 }
 
-void Scheduler::addProcess(const Process& process) {
+std::shared_ptr<Process> Scheduler::addProcess(const Process& process) {
     std::lock_guard<std::mutex> lock(processMutex);
     auto newProcess = std::make_shared<Process>(process);
     processes.push_back(newProcess);
 
     std::lock_guard<std::mutex> queueLock(queueMutex);
     readyQueue.push(newProcess);
+
+    return newProcess;
 }
 
 
@@ -54,8 +56,16 @@ bool Scheduler::initialize(ConfigurationManager* newConfigManager) {
 
 void Scheduler::initializeCoreWorkers() {
     for (int i = 0; i < configManager->getNumCPU(); i++) {
-        cores.emplace_back(std::make_unique<CoreWorker>(i + 1));
-        cores.back()->start();
+        if (configManager->getSchedulerAlgorithm() == "rr") {
+            cores.emplace_back(std::make_unique<CoreWorker>(i + 1, configManager->getDelayPerExec(), configManager->getQuantumCycles()));
+            cores.back()->start();
+        }
+
+        else {
+            cores.emplace_back(std::make_unique<CoreWorker>(i + 1, configManager->getDelayPerExec()));
+            cores.back()->start();
+        }
+        
     }
 }
 
@@ -144,11 +154,6 @@ int Scheduler::getAvailableCoreWorkerID() {
     return 0;
 }
 
-void Scheduler::initializeFinishedProcess(std::shared_ptr<Process> process, int CoreWorkerID) {
-    cores[CoreWorkerID - 1]->finishProcess();
-    finishedProcesses.push_back(process);
-}
-
 void Scheduler::scheduleFCFS() {
     while (running) {
         std::lock_guard<std::mutex> lock(queueMutex);
@@ -162,12 +167,8 @@ void Scheduler::scheduleFCFS() {
             if (coreID > 0) {
                 process->setCore(coreID);
                 cores[coreID - 1]->setProcess(process);
-
-                std::thread([this, process, coreID]() {
-                    cores[coreID - 1]->runProcess();
-                    initializeFinishedProcess(process, coreID);
-                    }).detach();
             }
+
             else {
                 // No available core, put the process back at the front of the queue
                 std::queue<std::shared_ptr<Process>> tempQueue;
@@ -181,7 +182,6 @@ void Scheduler::scheduleFCFS() {
         }
     }
 }
-
 
 void Scheduler::scheduleSJF() {
     while (running) {
@@ -194,9 +194,10 @@ void Scheduler::scheduleSJF() {
                 sortedProcesses.push_back(readyQueue.front());
                 readyQueue.pop();
             }
+
             std::sort(sortedProcesses.begin(), sortedProcesses.end(), [](const std::shared_ptr<Process>& a, const std::shared_ptr<Process>& b) {
                 return a->getTotalInstructions() < b->getTotalInstructions();
-                });
+            });
 
             // Assign sorted processes to available cores
             for (auto& process : sortedProcesses) {
@@ -205,11 +206,6 @@ void Scheduler::scheduleSJF() {
                 if (coreID > 0) {
                     process->setCore(coreID);
                     cores[coreID - 1]->setProcess(process);
-
-                    std::thread([this, process, coreID]() {
-                        cores[coreID - 1]->runProcess();
-                        initializeFinishedProcess(process, coreID);
-                        }).detach();
                 }
                 else {
                     readyQueue.push(process); // Put back in the ready queue if no core is available
@@ -220,11 +216,11 @@ void Scheduler::scheduleSJF() {
 }
 
 
-
 void Scheduler::scheduleRR() {
     while (running) {
         std::lock_guard<std::mutex> lock(queueMutex);
         if (!readyQueue.empty()) {
+
             auto process = readyQueue.front();
             readyQueue.pop();
 
@@ -233,38 +229,12 @@ void Scheduler::scheduleRR() {
             if (coreID > 0) {
                 process->setCore(coreID);
                 cores[coreID - 1]->setProcess(process);
-
-                int quantum = configManager->getQuantumCycles();
-                while (quantum > 0 && !process->isFinished()) {
-                    cores[coreID - 1]->runProcess();
-                    quantum--;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(configManager->getDelayPerExec() * 1000));
-                }
-
-                if (!process->isFinished()) {
-                    // Put back at the front of the queue if not finished
-                    std::queue<std::shared_ptr<Process>> tempQueue;
-                    tempQueue.push(process);
-                    while (!readyQueue.empty()) {
-                        tempQueue.push(readyQueue.front());
-                        readyQueue.pop();
-                    }
-                    readyQueue = tempQueue;
-                }
-                else {
-                    initializeFinishedProcess(process, coreID);
-                }
             }
             else {
                 // No available core, put the process back at the front of the queue
-                std::queue<std::shared_ptr<Process>> tempQueue;
-                tempQueue.push(process);
-                while (!readyQueue.empty()) {
-                    tempQueue.push(readyQueue.front());
-                    readyQueue.pop();
-                }
-                readyQueue = tempQueue;
+                readyQueue.push(process);
             }
+
         }
     }
 }
