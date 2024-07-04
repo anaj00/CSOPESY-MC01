@@ -66,14 +66,32 @@ void MainMenuScreen::handleCommand(string command) {
                 consoleManager.displayStatus();
             }
 
-            else if (command.substr(0,9) == "screen -s") {
+            else if (command.substr(0,9) == "screen -s") { 
                 std::string processName = command.substr(10);
-                consoleManager.createProcessScreen(processName);
+                trim(processName);
+                if (processName.empty()){
+                    std::cout << "Command not recognized! Please provide a process name." << std::endl;
+                }
+                else {
+                    if (!consoleManager.ifProcessExists(processName)) {
+                        consoleManager.createProcessScreen(processName);
+                    }
+                    else {
+                        std::cout << "Process already exists or has existed. Please provide a differen name." << std::endl;
+                    }
+                   
+                }
             }
 
             else if (command.substr(0,9) == "screen -r") {
                 std::string processName = command.substr(10);
-				consoleManager.switchScreen("PROCESS_SCREEN_" + processName);
+                trim(processName);
+                if (processName.empty()) {
+                    std::cout << "Command not recognized! Please provide a process name." << std::endl;
+                }
+                else {
+                    consoleManager.switchScreen("PROCESS_SCREEN_" + processName);
+                }
             }
 
         } else if (command.substr(0, 9) == "scheduler") {
@@ -107,4 +125,23 @@ void MainMenuScreen::handleCommand(string command) {
     } else {
         std::cout << "You must initialize the program first." << std::endl;
     }
+}
+
+void MainMenuScreen::ltrim(std::string& s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+        return !std::isspace(ch);
+        }));
+}
+
+// Function to trim whitespace from the end (in place)
+void MainMenuScreen::rtrim(std::string& s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+        return !std::isspace(ch);
+        }).base(), s.end());
+}
+
+// Function to trim whitespace from both ends (in place)
+void MainMenuScreen::trim(std::string& s) {
+    ltrim(s);
+    rtrim(s);
 }

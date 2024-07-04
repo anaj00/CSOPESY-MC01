@@ -34,8 +34,9 @@ public:
 
 	void startSchedulerTest();
 	void stopSchedulerTest();
-	
 	void displayStatus();
+
+	bool ifProcessExists(std::string name);
 
 private:
 	ConfigurationManager configManager; // Configuration manager object

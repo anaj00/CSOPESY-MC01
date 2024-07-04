@@ -149,3 +149,10 @@ void ConsoleManager::stopSchedulerTest() {
 void ConsoleManager::displayStatus() {
 	scheduler.displayStatus();	
 }
+
+bool ConsoleManager::ifProcessExists(std::string name) {
+	bool flag;
+	if (scheduler.getProcessByName(name) == nullptr) return false;
+	return true;
+}
+
