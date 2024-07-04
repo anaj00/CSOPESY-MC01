@@ -37,6 +37,7 @@ public:
 	void displayStatus();
 
 	bool ifProcessExists(std::string name);
+	bool isProcessFinished(std::string name);
 
 private:
 	ConfigurationManager configManager; // Configuration manager object

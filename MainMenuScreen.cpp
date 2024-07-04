@@ -90,7 +90,12 @@ void MainMenuScreen::handleCommand(string command) {
                     std::cout << "Command not recognized! Please provide a process name." << std::endl;
                 }
                 else {
-                    consoleManager.switchScreen("PROCESS_SCREEN_" + processName);
+                    if (consoleManager.isProcessFinished(processName)) {
+                        std::cout << "Process " << processName << " not found." << std::endl;
+                    }
+                    else {
+                        consoleManager.switchScreen("PROCESS_SCREEN_" + processName);
+                    }
                 }
             }
 
@@ -112,8 +117,8 @@ void MainMenuScreen::handleCommand(string command) {
 			std::cout << "marquee - Switch to marquee screen" << std::endl;
 			std::cout << "screen -ls - List all screens" << std::endl;
 			std::cout << "screen -s [processName] - Create a new process screen" << std::endl;
-			std::cout << "scheduler test - Start the scheduler test" << std::endl;
-			std::cout << "scheduler stop - Stop the scheduler test" << std::endl;
+			std::cout << "scheduler-test - Start the scheduler test" << std::endl;
+			std::cout << "scheduler-stop - Stop the scheduler test" << std::endl;
 			std::cout << "report-util - Save the report" << std::endl;
 			std::cout << "exit - Exit the program" << std::endl;
 		}
