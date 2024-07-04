@@ -1,17 +1,18 @@
-CPU utilization: 75%
-Cores used: 3
-Cores available: 1
+CPU utilization: 100%
+Cores used: 4
+Cores available: 0
 --------------------------------------------
 Running processes:
-Process             Creation Time                 Core           Progress       
-SchedTest_0_4       07/04/2024 06:52:17AM         Core: 1    890   / 1398
-SchedTest_0_5       07/04/2024 06:52:19AM         Core: 4    275   / 1286
-SchedTest_0_6       07/04/2024 06:52:21AM         Core: 2    143   / 1728
+SchedTest_0_4       07/04/2024 10:14:22PM         Core:   2              0 / 1916
+SchedTest_0_5       07/04/2024 10:14:24PM         Core:   3              73 / 1666
+SchedTest_0_6       07/04/2024 10:14:26PM         Core:   1              414 / 1343
+SchedTest_0_7       07/04/2024 10:14:28PM         Core:   2              741 / 1202
+SchedTest_0_8       07/04/2024 10:14:30PM         Core:   4              267 / 1594
+SchedTest_0_9       07/04/2024 10:14:32PM         Core:                  0 / 1718
 
 Finished processes:
-Process             Creation Time                 Core           Progress       
-SchedTest_0_0       07/04/2024 06:52:08AM         Core: 1    1045  / 1045
-SchedTest_0_1       07/04/2024 06:52:10AM         Core: 2    1663  / 1663
-SchedTest_0_2       07/04/2024 06:52:12AM         Core: 3    1647  / 1647
-SchedTest_0_3       07/04/2024 06:52:15AM         Core: 4    1273  / 1273
+SchedTest_0_0       07/04/2024 10:14:14PM         Core:   1              1665 / 1665
+SchedTest_0_1       07/04/2024 10:14:16PM         Core:   2              1222 / 1222
+SchedTest_0_2       07/04/2024 10:14:18PM         Core:   3              1762 / 1762
+SchedTest_0_3       07/04/2024 10:14:20PM         Core:   4              1439 / 1439
 --------------------------------------------

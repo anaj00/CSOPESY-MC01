@@ -125,10 +125,19 @@ void Scheduler::displayStatus() {
     for (const auto& process : processes) {
         if (!process->isFinished()) {
             std::cout << std::left << std::setw(20) << process->getName()
-                << std::left << std::setw(30) << process->getCreationTime()
-                << "Core:   " << std::setw(15) << process->getCore()
-                << std::left << std::setw(1) << process->getCurrentInstruction() << " / "
-                << process->getTotalInstructions() << "\n";
+                << std::left << std::setw(30) << process->getCreationTime();
+
+            // Check if the process has been assigned a core
+            if (process->getCore() != -1) {
+                std::cout << "Core:   " << std::setw(15) << process->getCore();
+                std::cout << std::left << std::setw(1) << process->getCurrentInstruction() << " / "
+                    << process->getTotalInstructions() << "\n";
+            }
+            else {
+                std::cout << "Core:   " << std::setw(15) << " "; // Adjust the width to maintain alignment
+                std::cout << std::left << std::setw(1) << process->getCurrentInstruction() << " / "
+                    << process->getTotalInstructions() << "\n";
+            }
         }
     }
 
@@ -176,45 +185,40 @@ void Scheduler::saveReport() {
 
     file << "Running processes:\n";
 
-    // Column headers
-    file << std::left << std::setw(20) << "Process"
-        << std::left << std::setw(30) << "Creation Time"
-        << std::left << std::setw(15) << "Core"
-        << std::left << std::setw(15) << "Progress" << "\n";
-
     for (const auto& process : processes) {
         if (!process->isFinished()) {
             file << std::left << std::setw(20) << process->getName()
-                << std::left << std::setw(30) << process->getCreationTime()
-                << "Core: " << std::setw(5) << process->getCore()
-                << std::left << std::setw(5) << process->getCurrentInstruction() << " / "
-                << process->getTotalInstructions() << "\n";
+                << std::left << std::setw(30) << process->getCreationTime();
+
+            // Check if the process has been assigned a core
+            if (process->getCore() != -1) {
+                file << "Core:   " << std::setw(15) << process->getCore();
+                file << std::left << std::setw(1) << process->getCurrentInstruction() << " / "
+                    << process->getTotalInstructions() << "\n";
+            }
+            else {
+                file << "Core:   " << std::setw(15) << " "; // Adjust the width to maintain alignment
+                file << std::left << std::setw(1) << process->getCurrentInstruction() << " / "
+                    << process->getTotalInstructions() << "\n";
+            }
         }
     }
 
     file << "\nFinished processes:\n";
 
-    // Column headers
-    file << std::left << std::setw(20) << "Process"
-        << std::left << std::setw(30) << "Creation Time"
-        << std::left << std::setw(15) << "Core"
-        << std::left << std::setw(15) << "Progress" << "\n";
-
     for (const auto& process : processes) {
         if (process->isFinished()) {
             file << std::left << std::setw(20) << process->getName()
                 << std::left << std::setw(30) << process->getCreationTime()
-                << "Core: " << std::setw(5) << process->getCore()
-                << std::left << std::setw(5) << process->getCurrentInstruction() << " / "
+                << "Core:   " << std::setw(15) << process->getCore()
+                << std::left << std::setw(1) << process->getCurrentInstruction() << " / "
                 << process->getTotalInstructions() << "\n";
         }
     }
 
     file << "--------------------------------------------\n";
 
-    file.close();
-
-    std::cout << "Report saved to csopesy-log.txt" << std::endl;
+    std::cout << "Report saved at csopesy-log.txt!" << std::endl;
 }
 
 
@@ -337,7 +341,7 @@ void Scheduler::schedulePreemptiveSJF() {
                             
                             // Preempt the current process
                             readyQueue.push(runningProcess);
-                            process->setCore(core->getID() - 1);
+                            process->setCore(core->getID());
                             core->setProcess(process);
                             preempted = true;
                             break;
