@@ -48,7 +48,8 @@ private:
     int getAvailableCoreWorkerID();
 
     void scheduleFCFS();
-    void scheduleSJF();
+    void scheduleNonPreemptiveSJF();
+    void schedulePreemptiveSJF();
     void scheduleRR();
 
     void generateProcess(int& ID, int instructionCount);

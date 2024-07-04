@@ -80,7 +80,12 @@ void Scheduler::schedulerLoop() {
             scheduleFCFS();
         }
         else if (configManager->getSchedulerAlgorithm() == "sjf") {
-            scheduleSJF();
+            if (configManager->isPreemptive()) {
+				schedulePreemptiveSJF();
+			}
+			else {
+				scheduleNonPreemptiveSJF();
+			}
         }
         else if (configManager->getSchedulerAlgorithm() == "rr") {
             scheduleRR();
@@ -267,26 +272,26 @@ void Scheduler::scheduleFCFS() {
     }
 }
 
-void Scheduler::scheduleSJF() {
+void Scheduler::scheduleNonPreemptiveSJF() {
     while (running) {
         std::lock_guard<std::mutex> lock(queueMutex);
         if (!readyQueue.empty()) {
 
-            // Sort the ready queue by total instructions
+            // Move processes to a vector for sorting
             std::vector<std::shared_ptr<Process>> sortedProcesses;
             while (!readyQueue.empty()) {
                 sortedProcesses.push_back(readyQueue.front());
                 readyQueue.pop();
             }
 
+            // Sort processes by total instructions (burst time)
             std::sort(sortedProcesses.begin(), sortedProcesses.end(), [](const std::shared_ptr<Process>& a, const std::shared_ptr<Process>& b) {
                 return a->getTotalInstructions() < b->getTotalInstructions();
-            });
+                });
 
             // Assign sorted processes to available cores
             for (auto& process : sortedProcesses) {
                 auto coreID = getAvailableCoreWorkerID();
-
                 if (coreID > 0) {
                     process->setCore(coreID);
                     cores[coreID - 1]->setProcess(process);
@@ -298,6 +303,57 @@ void Scheduler::scheduleSJF() {
         }
     }
 }
+
+void Scheduler::schedulePreemptiveSJF() {
+    while (running) {
+        std::lock_guard<std::mutex> lock(queueMutex);
+        if (!readyQueue.empty()) {
+
+            // Sort the ready queue by remaining instructions
+            std::vector<std::shared_ptr<Process>> sortedProcesses;
+            while (!readyQueue.empty()) {
+                sortedProcesses.push_back(readyQueue.front());
+                readyQueue.pop();
+            }
+
+            std::sort(sortedProcesses.begin(), sortedProcesses.end(), [](const std::shared_ptr<Process>& a, const std::shared_ptr<Process>& b) {
+                return a->getRemainingInstructions() < b->getRemainingInstructions();
+                });
+
+            // Assign sorted processes to available cores or preempt if necessary
+            for (auto& process : sortedProcesses) {
+                auto coreID = getAvailableCoreWorkerID();
+
+                if (coreID > 0) {
+                    process->setCore(coreID);
+                    cores[coreID - 1]->setProcess(process);
+                }
+                else {
+                    // Check for preemption
+                    bool preempted = false;
+                    for (auto& core : cores) {
+                        auto runningProcess = core->getCurrentProcess();
+                        if (runningProcess && runningProcess->getRemainingInstructions() > process->getRemainingInstructions()) {
+                            
+                            // Preempt the current process
+                            readyQueue.push(runningProcess);
+                            process->setCore(core->getID() - 1);
+                            core->setProcess(process);
+                            preempted = true;
+                            break;
+                        }
+                    }
+
+                    if (!preempted) {
+                        readyQueue.push(process); // Put back in the ready queue if no preemption occurred
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 
 
 void Scheduler::scheduleRR() {

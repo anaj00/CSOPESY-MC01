@@ -11,6 +11,7 @@ public:
 	int getID() const;
 	int getCurrentInstruction() const;
 	int getTotalInstructions() const;
+	int getRemainingInstructions() const;
 	int getCore();
 	void setCore(int coreID);
 	bool isFinished() const;

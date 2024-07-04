@@ -20,6 +20,11 @@ int Process::getTotalInstructions() const {
 	return totalInstructions;
 }
 
+int Process::getRemainingInstructions() const {
+	return totalInstructions - currentInstruction;
+}
+
+
 int Process::getCore() {
 	return core;
 }
