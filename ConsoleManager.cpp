@@ -30,14 +30,35 @@ void ConsoleManager::run()
 }
 
 void ConsoleManager::switchScreen(const std::string consoleName) {
-	if (consoles.find(consoleName) != consoles.end()) {
-		previousConsole = currentConsole;
-		currentConsole = consoles[consoleName];
-		system("cls");
-		currentConsole->onExecute();
+	if (consoleName.substr(0, 15) == "PROCESS_SCREEN_") {
+		std::string processName = consoleName.substr(15);
+		std::shared_ptr<Process> process = scheduler.getProcessByName(processName);
 
-	} else {
-		std::cerr << "Console " << consoleName << " not found." << std::endl;
+		if (process) {
+			if (!process->isFinished()) {
+				previousConsole = currentConsole;
+				currentConsole = consoles[consoleName];
+				system("cls");
+				currentConsole->onExecute();
+			}
+			else {
+				std::cerr << "Process " << processName << " has already finished." << std::endl;
+			}
+		}
+		else {
+			std::cerr << "Process " << processName << " not found." << std::endl;
+		}
+	}
+	else {
+		if (consoles.find(consoleName) != consoles.end()) {
+			previousConsole = currentConsole;
+			currentConsole = consoles[consoleName];
+			system("cls");
+			currentConsole->onExecute();
+		}
+		else {
+			std::cerr << "Console " << consoleName << " not found." << std::endl;
+		}
 	}
 }
 

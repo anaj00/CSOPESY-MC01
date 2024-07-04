@@ -19,8 +19,7 @@ public:
     ~Scheduler();
 
     std::shared_ptr<Process> addProcess(const Process& process);
-    std::shared_ptr<Process> getProcessByName(const std::string& name);
-    void printProcessList();
+    std::shared_ptr<Process> getProcessByName(const std::string name);
 
     bool initialize(ConfigurationManager* newConfigManager);
     void run();

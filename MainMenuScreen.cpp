@@ -71,6 +71,11 @@ void MainMenuScreen::handleCommand(string command) {
                 consoleManager.createProcessScreen(processName);
             }
 
+            else if (command.substr(0,9) == "screen -r") {
+                std::string processName = command.substr(10);
+				consoleManager.switchScreen("PROCESS_SCREEN_" + processName);
+            }
+
         } else if (command.substr(0, 9) == "scheduler") {
             if (command.substr(10) == "test") {
                 consoleManager.startSchedulerTest();

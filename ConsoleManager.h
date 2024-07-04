@@ -8,6 +8,7 @@
 #include "AConsole.h"
 #include "ConfigurationManager.h"
 #include "Scheduler.h"
+#include "ProcessScreen.h"
 
 class ConsoleManager
 {
@@ -29,6 +30,7 @@ public:
 
 	Scheduler& getScheduler(); // Function to get the scheduler
 	void createProcessScreen(const std::string processName); // Function to create a process screen)
+	std::shared_ptr<ProcessScreen> getProcessScreen(const std::string processName); // Function to get a process screen
 
 	void startSchedulerTest();
 	void stopSchedulerTest();

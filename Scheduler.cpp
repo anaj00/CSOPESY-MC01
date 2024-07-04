@@ -32,7 +32,7 @@ std::shared_ptr<Process> Scheduler::addProcess(const Process& process) {
 }
 
 
-std::shared_ptr<Process> Scheduler::getProcessByName(const std::string& name) {
+std::shared_ptr<Process> Scheduler::getProcessByName(const std::string name) {
     std::lock_guard<std::mutex> lock(processMutex);
     for (auto& process : processes) {
         if (process->getName() == name) {
