@@ -8,7 +8,7 @@
 class ProcessScreen : public AConsole
 {
 public:
-	ProcessScreen(Process myProcess);
+	ProcessScreen(std::shared_ptr<Process> myProcess);
 
 	void onExecute() override;
 	void display() override;
@@ -18,6 +18,6 @@ private:
 	void displayHeader();
 	bool handleCommand(string command);
 
-	Process thisProcess;
+	std::shared_ptr<Process> thisProcess;
 };
 

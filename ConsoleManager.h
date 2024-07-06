@@ -2,10 +2,13 @@
 #include <memory>
 #include <unordered_map>
 #include <string>
+#include <thread>
+
 
 #include "AConsole.h"
 #include "ConfigurationManager.h"
 #include "Scheduler.h"
+#include "ProcessScreen.h"
 
 class ConsoleManager
 {
@@ -27,6 +30,15 @@ public:
 
 	Scheduler& getScheduler(); // Function to get the scheduler
 	void createProcessScreen(const std::string processName); // Function to create a process screen)
+	void createProcess(const std::string processName); // Function to create a process screen)
+
+
+	void startSchedulerTest();
+	void stopSchedulerTest();
+	void displayStatus();
+
+	bool ifProcessExists(std::string name);
+	bool isProcessFinished(std::string name);
 
 private:
 	ConfigurationManager configManager; // Configuration manager object
@@ -38,5 +50,10 @@ private:
 
 	int processID = 0; // Process ID Tracker
 	int getRandomInstruction(); // Function to get a random number of instructions
+
+	std::atomic<bool> schedulerTest{ false };
+	std::thread testThread;
+	std::mutex mtx;
+	void schedulerTestLoop();
 };
 

@@ -36,7 +36,9 @@ int ConfigurationManager::getNumCPU() const {
 }
 
 std::string ConfigurationManager::getSchedulerAlgorithm() const {
-	return schedulerAlgorithm;
+	size_t firstQuote = schedulerAlgorithm.find('\"');
+	size_t secondQuote = schedulerAlgorithm.find('\"', firstQuote + 1);
+	return schedulerAlgorithm.substr(firstQuote + 1, secondQuote - firstQuote - 1);
 }
 
 int ConfigurationManager::getQuantumCycles() const {

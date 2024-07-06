@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include <string>
 
 class Process
@@ -10,7 +11,12 @@ public:
 	int getID() const;
 	int getCurrentInstruction() const;
 	int getTotalInstructions() const;
+	int getRemainingInstructions() const;
+	int getCore();
+	void setCore(int coreID);
 	bool isFinished() const;
+	std::string getCreationTime() const;
+
 	void execute();
 
 private:
@@ -18,6 +24,8 @@ private:
 	int id;
 	int currentInstruction;
 	int totalInstructions;
+	int core;
 	bool finished;
+	std::chrono::system_clock::time_point creationTime;
 };
 
