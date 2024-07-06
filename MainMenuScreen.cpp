@@ -49,6 +49,7 @@ void MainMenuScreen::displayHeader(){
 void MainMenuScreen::handleCommand(string command) {
     if (command == "exit") {
         std::cout << "Exiting the program..." << std::endl;
+		consoleManager.getScheduler().stop();
         exit(0);
 
     } else if (command == "initialize" && !consoleManager.isInitialized()) {
