@@ -31,9 +31,9 @@ private:
 	std::string schedulerAlgorithm;
 	int quantumCycles;
 	bool preemptive;
-	int batchProcessFrequency;
+	float batchProcessFrequency;
 	int minInstructions;
 	int maxInstructions;
-	int delayPerExec;
+	float delayPerExec;
 };
 
