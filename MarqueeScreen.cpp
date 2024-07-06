@@ -108,13 +108,12 @@ void MarqueeScreen::drawOnBuffer(int x, int y, const std::string text, WORD attr
 
 void MarqueeScreen::displayHeader() {
 	drawOnBuffer(0, 0, "***********************************", 0x0F);
-	drawOnBuffer(0, 1, "Displaying a MEOWquee console!", 0x0F);
+	drawOnBuffer(0, 1, "Displaying a Marquee console!", 0x0F);
 	drawOnBuffer(0, 2, "***********************************", 0x0F);
 }
 
 void MarqueeScreen::displayFooter() {
-	drawOnBuffer(0, screenHeight - 2, "Meow meow we are MEOWrquee", 0x0F);
-	drawOnBuffer(0, screenHeight - 1, "Type your text here: " + userInput, 0x0F);
+	drawOnBuffer(0, screenHeight - 1, "Type your text here, to exit, type 'exit': " + userInput, 0x0F);
 }
 
 void MarqueeScreen::clearConsole() {
