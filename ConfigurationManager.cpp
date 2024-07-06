@@ -49,7 +49,7 @@ bool ConfigurationManager::isPreemptive() const {
 	return preemptive;
 }
 
-int ConfigurationManager::getBatchProcessFrequency() const {
+float ConfigurationManager::getBatchProcessFrequency() const {
 	return batchProcessFrequency;
 }
 
@@ -61,7 +61,7 @@ int ConfigurationManager::getMaxInstructions() const {
 	return maxInstructions;
 }
 
-int ConfigurationManager::getDelayPerExec() const {
+float ConfigurationManager::getDelayPerExec() const {
 	return delayPerExec;
 }
 
