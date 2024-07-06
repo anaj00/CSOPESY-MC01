@@ -66,7 +66,7 @@ void Scheduler::initializeCoreWorkers() {
             cores.emplace_back(std::make_unique<CoreWorker>(i + 1, configManager->getDelayPerExec()));
             cores.back()->start();
         }
-        
+
     }
 }
 
