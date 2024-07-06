@@ -51,6 +51,7 @@ void MainMenuScreen::handleCommand(string command) {
         std::cout << "Exiting the program..." << std::endl;
 		consoleManager.getScheduler().stop();
         exit(0);
+        std::terminate();
 
     } else if (command == "initialize" && !consoleManager.isInitialized()) {
         consoleManager.setInitialized();
@@ -78,7 +79,7 @@ void MainMenuScreen::handleCommand(string command) {
                         consoleManager.createProcessScreen(processName);
                     }
                     else {
-                        std::cout << "Process already exists or has existed. Please provide a differen name." << std::endl;
+                        std::cout << "Process already exists or has existed. Please provide a different name." << std::endl;
                     }
                    
                 }

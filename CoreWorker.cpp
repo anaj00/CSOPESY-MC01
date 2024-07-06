@@ -27,7 +27,7 @@ void CoreWorker::runProcess() {
     if (quantumSlice == 0) {
         while (currentProcess && !currentProcess->isFinished()) {
             currentProcess->execute();
-            std::this_thread::sleep_for(std::chrono::milliseconds(delayPerExec));
+            std::this_thread::sleep_for(std::chrono::seconds(delayPerExec));
         }
 
         if (currentProcess && currentProcess->isFinished()) {
@@ -41,7 +41,7 @@ void CoreWorker::runProcess() {
                 return;
             }
             currentProcess->execute();
-            std::this_thread::sleep_for(std::chrono::milliseconds(delayPerExec));
+            std::this_thread::sleep_for(std::chrono::seconds(delayPerExec));
         }
 
         // Process is not finished, notify Scheduler
@@ -82,6 +82,7 @@ void CoreWorker::start() {
 }
 
 void CoreWorker::stop() {
+    running = false;
     {
         std::lock_guard<std::mutex> lock(coreMutex);
         running = false;
