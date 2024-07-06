@@ -108,9 +108,6 @@ void ConsoleManager::createProcessScreen(const std::string processName) {
 
 	// Create new process
 	Process newProcess(processName, processID, getRandomInstruction());
-	std::cout << newProcess.getName() << "\n";
-	std::cout << newProcess.getID() << "\n";
-	std::cout << newProcess.getTotalInstructions() << "\n";
 	
 	std::shared_ptr<Process> processPointer = scheduler.addProcess(newProcess);
 
@@ -124,6 +121,21 @@ void ConsoleManager::createProcessScreen(const std::string processName) {
 	switchScreen(processScreen->getName());
 }
 
+void ConsoleManager::createProcess(const std::string processName) {
+	processID++;
+
+	// Create new process
+	Process newProcess(processName, processID, getRandomInstruction());
+
+	std::shared_ptr<Process> processPointer = scheduler.addProcess(newProcess);
+
+	// Create new process screen
+	auto processScreen = std::make_shared<ProcessScreen>(processPointer);
+
+	// Add process screen to console manager
+	addConsole(processScreen);
+}
+
 int ConsoleManager::getRandomInstruction() {
 	std::random_device rd;
 	std::mt19937 gen(rd());
@@ -133,17 +145,30 @@ int ConsoleManager::getRandomInstruction() {
 }
 
 void ConsoleManager::startSchedulerTest() {
-	std::thread schedulerThread([this]() {
-		this->scheduler.startSchedulerTest(this->processID, [this]() {
-			return this->getRandomInstruction();
-			});
-		});
-	schedulerThread.detach();
+	std::lock_guard<std::mutex> lock(mtx);
+	if (!schedulerTest) {
+		schedulerTest = true;
+		testThread = std::thread(&ConsoleManager::schedulerTestLoop, this);
+	}
 }
 
-
 void ConsoleManager::stopSchedulerTest() {
-	scheduler.stopSchedulerTest();
+	{
+		std::lock_guard<std::mutex> lock(mtx);
+		if (schedulerTest) {
+			schedulerTest = false;
+		}
+	}
+	if (testThread.joinable()) {
+		testThread.join();  // Ensure the thread is properly joined
+	}
+}
+
+void ConsoleManager::schedulerTestLoop() {
+	while (schedulerTest) {
+		createProcess("process_" + std::to_string(processID));
+		std::this_thread::sleep_for(std::chrono::seconds(configManager.getBatchProcessFrequency()));
+	}
 }
 
 void ConsoleManager::displayStatus() {

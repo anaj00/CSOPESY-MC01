@@ -52,11 +52,6 @@ private:
     void schedulePreemptiveSJF();
     void scheduleRR();
 
-    void generateProcess(int& ID, int instructionCount);
-
     std::thread schedulerThread;
     void schedulerLoop();
-
-    int processTestNumber = 0;
-    int processTestIteration = 0;
 };

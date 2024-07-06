@@ -97,11 +97,6 @@ void Scheduler::stop() {
     running = false;
 }
 
-//void Scheduler::setConsoleColor(WORD attributes) {
-//    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-//    SetConsoleTextAttribute(hConsole, attributes);
-//}
-
 void Scheduler::displayStatus() {
     std::lock_guard<std::mutex> lock(processMutex);
 
@@ -219,23 +214,6 @@ void Scheduler::saveReport() {
     file << "--------------------------------------------\n";
 
     std::cout << "Report saved at csopesy-log.txt!" << std::endl;
-}
-
-
-void Scheduler::startSchedulerTest(int& ID, std::function<int()> getRandomInstruction) {
-    if (!isTestRunning) {
-        isTestRunning = true;
-    }
-    while (isTestRunning) {
-        int instructionCount = getRandomInstruction();
-        generateProcess(ID, instructionCount);
-        std::this_thread::sleep_for(std::chrono::milliseconds(configManager->getBatchProcessFrequency() * 1000));
-    }
-}
-
-void Scheduler::stopSchedulerTest() {
-    isTestRunning = false;
-    processTestIteration++;
 }
 
 int Scheduler::getAvailableCoreWorkerID() {
@@ -391,20 +369,4 @@ void Scheduler::scheduleRR() {
             }
         }
     }
-}
-
-
-
-
-
-void Scheduler::generateProcess(int& id, int instructionCount) {
-    std::string processName = "SchedTest";
-    processName.append("_" + std::to_string(processTestIteration));
-    processName.append("_" + std::to_string(processTestNumber));
-
-    Process newProcess(processName, id, instructionCount);
-    addProcess(newProcess);
-
-    id++;
-    processTestNumber++;
 }

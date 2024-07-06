@@ -30,7 +30,8 @@ public:
 
 	Scheduler& getScheduler(); // Function to get the scheduler
 	void createProcessScreen(const std::string processName); // Function to create a process screen)
-	std::shared_ptr<ProcessScreen> getProcessScreen(const std::string processName); // Function to get a process screen
+	void createProcess(const std::string processName); // Function to create a process screen)
+
 
 	void startSchedulerTest();
 	void stopSchedulerTest();
@@ -49,5 +50,10 @@ private:
 
 	int processID = 0; // Process ID Tracker
 	int getRandomInstruction(); // Function to get a random number of instructions
+
+	std::atomic<bool> schedulerTest{ false };
+	std::thread testThread;
+	std::mutex mtx;
+	void schedulerTestLoop();
 };
 
