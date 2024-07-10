@@ -28,9 +28,6 @@ public:
     void displayStatus();
     void saveReport();
 
-    void startSchedulerTest(int& ID, std::function<int()> getRandomInstruction);
-    void stopSchedulerTest();
-
 private:
     ConfigurationManager* configManager;
 

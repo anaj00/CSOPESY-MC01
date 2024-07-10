@@ -20,6 +20,10 @@ public:
 	int getMinInstructions() const; // Returns the minimum number of instructions a process can have
 	int getMaxInstructions() const; // Returns the maximum number of instructions a process can have
 	int getDelayPerExec() const; // Returns the delay per execution
+	int getMaxOverallMemory() const; // Returns the maximum overall memory
+	int getMinMemoryPerProcess() const; // Returns the maximum memory per process
+	int getMaxMemoryPerProcess() const; // Returns the maximum memory per process
+
 
 private:
 	void parseConfigFile();	// Parses the config file and sets the configuration values
@@ -35,5 +39,8 @@ private:
 	int minInstructions;
 	int maxInstructions;
 	int delayPerExec;
+	int maxOverallMemory;
+	int minMemoryPerProcess;
+	int maxMemoryPerProcess;
 };
 

@@ -180,6 +180,7 @@ bool ConsoleManager::ifProcessExists(std::string name) {
 	if (scheduler.getProcessByName(name) == nullptr) return false;
 	return true;
 }
+
 bool ConsoleManager::isProcessFinished(std::string name) {
 	if (ifProcessExists(name)) {
 		std::shared_ptr<Process> foundProcess = scheduler.getProcessByName(name);

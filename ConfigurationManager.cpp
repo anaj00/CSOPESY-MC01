@@ -65,6 +65,18 @@ int ConfigurationManager::getDelayPerExec() const {
 	return delayPerExec;
 }
 
+int ConfigurationManager::getMaxOverallMemory() const {
+	return maxOverallMemory;
+}
+
+int ConfigurationManager::getMinMemoryPerProcess() const {
+	return minMemoryPerProcess;
+}
+
+int ConfigurationManager::getMaxMemoryPerProcess() const {
+	return maxMemoryPerProcess;
+}
+
 void ConfigurationManager::parseConfigFile() {
 	std::ifstream configFile("config.txt");
 
@@ -116,6 +128,14 @@ void ConfigurationManager::parseConfigFile() {
 		} else if (key == "delay-per-exec") {
 			iss >> delayPerExec;
 
+		} else if (key == "max-overall-mem"){
+			iss >> maxOverallMemory;
+
+		} else if (key == "min-mem-per-proc"){
+			iss >> minMemoryPerProcess;
+
+		} else if (key == "max-mem-per-proc") {
+			iss >> maxMemoryPerProcess;
 		}
 	}
 
