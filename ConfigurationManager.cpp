@@ -49,7 +49,7 @@ bool ConfigurationManager::isPreemptive() const {
 	return preemptive;
 }
 
-int ConfigurationManager::getBatchProcessFrequency() const {
+float ConfigurationManager::getBatchProcessFrequency() const {
 	return batchProcessFrequency;
 }
 
@@ -153,5 +153,8 @@ void ConfigurationManager::printConfig() {
 	std::cout << "min-ins: " << minInstructions << std::endl;
 	std::cout << "max-ins: " << maxInstructions << std::endl;
 	std::cout << "delay-per-exec: " << delayPerExec << std::endl;
+	std::cout << "max-overall-mem: " << maxOverallMemory << std::endl;
+	std::cout << "min-mem-per-proc: " << minMemoryPerProcess << std::endl;
+	std::cout << "max-mem-per-proc: " << maxMemoryPerProcess << std::endl;
 	std::cout << "--------------------------" << std::endl;
 }
