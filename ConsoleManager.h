@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <string>
 #include <thread>
-
+#include <cstddef>
 
 #include "AConsole.h"
 #include "ConfigurationManager.h"
@@ -49,6 +49,7 @@ private:
 
 	int processID = 0; // Process ID Tracker
 	int getRandomInstruction(); // Function to get a random number of instructions
+	int getRandomMemoryPerProcess(); // Function to get a random number of memory per process
 
 	std::atomic<bool> schedulerTest{ false };
 	std::thread testThread;

@@ -1,8 +1,8 @@
 #include "CoreWorker.h"
+#include <thread>
+#include <chrono>
 
-#include <iostream>
-
-CoreWorker::CoreWorker(int id, int delayPerExec, int quantumSlice) 
+CoreWorker::CoreWorker(int id, int delayPerExec, int quantumSlice)
     : id(id), delayPerExec(delayPerExec), quantumSlice(quantumSlice), running(false), processAssigned(false) {}
 
 CoreWorker::~CoreWorker() {
@@ -13,8 +13,8 @@ CoreWorker::~CoreWorker() {
 }
 
 std::shared_ptr<Process> CoreWorker::getCurrentProcess() {
-	std::lock_guard<std::mutex> lock(coreMutex);
-	return currentProcess;
+    std::lock_guard<std::mutex> lock(coreMutex);
+    return currentProcess;
 }
 
 void CoreWorker::setProcess(std::shared_ptr<Process> process) {
@@ -50,11 +50,14 @@ void CoreWorker::runProcess() {
         }
 
         // Reset the current process to ensure it gets requeued
-        currentProcess.reset();
-        processAssigned = false;
+        finishProcess();
+
+        // Notify Scheduler of quantum cycle completion
+        if (quantumCycleCallback) {
+            quantumCycleCallback(id);
+        }
     }
 }
-
 
 void CoreWorker::finishProcess() {
     std::lock_guard<std::mutex> lock(coreMutex);
@@ -68,8 +71,8 @@ bool CoreWorker::isAvailable() {
 }
 
 bool CoreWorker::isAssignedProcess() {
-	std::lock_guard<std::mutex> lock(coreMutex);
-	return processAssigned;
+    std::lock_guard<std::mutex> lock(coreMutex);
+    return processAssigned;
 }
 
 int CoreWorker::getID() {
@@ -103,10 +106,18 @@ void CoreWorker::run() {
         if (processAssigned) {
             runProcess();
         }
+        else {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10)); // Avoid tight looping
+        }
     }
 }
 
 void CoreWorker::setProcessCompletionCallback(std::function<void(std::shared_ptr<Process>)> callback) {
     std::lock_guard<std::mutex> lock(coreMutex);
     processCompletionCallback = callback;
+}
+
+void CoreWorker::setQuantumCycleCallback(std::function<void(int)> callback) {
+    std::lock_guard<std::mutex> lock(coreMutex);
+    quantumCycleCallback = callback;
 }

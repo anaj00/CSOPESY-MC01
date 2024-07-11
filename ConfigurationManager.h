@@ -24,7 +24,6 @@ public:
 	int getMinMemoryPerProcess() const; // Returns the maximum memory per process
 	int getMaxMemoryPerProcess() const; // Returns the maximum memory per process
 
-
 private:
 	void parseConfigFile();	// Parses the config file and sets the configuration values
 	void printConfig(); 	// Prints the configuration values to the console

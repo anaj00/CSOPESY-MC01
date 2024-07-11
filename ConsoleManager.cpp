@@ -7,7 +7,6 @@
 #include "ProcessScreen.h"
 
 #include <random>
-
 ConsoleManager::ConsoleManager() {
 	auto MAIN_MENU = std::make_shared<MainMenuScreen>();
 	consoles[MAIN_MENU->getName()] = MAIN_MENU;
@@ -107,7 +106,7 @@ void ConsoleManager::createProcessScreen(const std::string processName) {
 	processID++;
 
 	// Create new process
-	Process newProcess(processName, processID, getRandomInstruction());
+	Process newProcess(processName, processID, getRandomInstruction(), getRandomMemoryPerProcess());
 	
 	std::shared_ptr<Process> processPointer = scheduler.addProcess(newProcess);
 
@@ -125,7 +124,7 @@ void ConsoleManager::createProcess(const std::string processName) {
 	processID++;
 
 	// Create new process
-	Process newProcess(processName, processID, getRandomInstruction());
+	Process newProcess(processName, processID, getRandomInstruction(), getRandomMemoryPerProcess());
 
 	std::shared_ptr<Process> processPointer = scheduler.addProcess(newProcess);
 
@@ -141,6 +140,14 @@ int ConsoleManager::getRandomInstruction() {
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> distr(configManager.getMinInstructions(), configManager.getMaxInstructions());
 	
+	return distr(gen);
+}
+
+int ConsoleManager::getRandomMemoryPerProcess() {
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> distr(configManager.getMinMemoryPerProcess(), configManager.getMaxMemoryPerProcess());
+
 	return distr(gen);
 }
 

@@ -1,8 +1,8 @@
 #include "Process.h"
 #include <iostream>
 
-Process::Process(std::string name, int id, int totalInstructions)
-	: processName(name), id(id), currentInstruction(0), totalInstructions(totalInstructions), core(-1), finished(false), creationTime(std::chrono::system_clock::now()){}
+Process::Process(std::string name, int id, int totalInstructions, int memorySize)
+	: processName(name), id(id), currentInstruction(0), totalInstructions(totalInstructions), core(-1), finished(false), creationTime(std::chrono::system_clock::now()), memorySize(memorySize) {}
 
 std::string Process::getName() const {
 	return processName;
@@ -24,9 +24,12 @@ int Process::getRemainingInstructions() const {
 	return totalInstructions - currentInstruction;
 }
 
-
 int Process::getCore() {
 	return core;
+}
+
+int Process::getMemorySize() const {
+	return memorySize;
 }
 
 void Process::setCore(int coreID) {
