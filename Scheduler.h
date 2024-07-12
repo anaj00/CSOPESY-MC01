@@ -11,6 +11,7 @@
 #include "Process.h"
 #include "ConfigurationManager.h"
 #include "CoreWorker.h"
+#include "FlatMemoryAllocator.h"
 
 class Scheduler
 {
@@ -41,6 +42,8 @@ private:
     bool running;
     bool isTestRunning;
 
+    std::unique_ptr<MemoryManager> memoryManager; // Use a unique_ptr for MemoryManager
+
     void initializeCoreWorkers();
     int getAvailableCoreWorkerID();
 
@@ -50,19 +53,8 @@ private:
     void scheduleRR();
 
     std::thread schedulerThread;
-    void schedulerLoop();
+    void schedulerLoop();   
 
-    // For memory management
-    std::mutex memoryMutex;
-    int totalMemory;
-    std::vector<std::pair<int, int>> freeMemoryBlocks; // (start, size)
-    std::vector<std::pair<int, std::shared_ptr<Process>>> allocatedMemory; // (start, process)
     int quantumCycle;
-
-    int allocateMemory(int size);
-    void deallocateMemory(std::shared_ptr<Process> process);
-    void mergeAdjacentBlocks();
-    void reportMemoryStatus();
-
     int quantumCycleCounter;
 };

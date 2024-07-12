@@ -133,6 +133,7 @@
     <ClCompile Include="ConfigurationManager.cpp" />
     <ClCompile Include="ConsoleManager.cpp" />
     <ClCompile Include="CoreWorker.cpp" />
+    <ClCompile Include="FlatMemoryAllocator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenuScreen.cpp" />
     <ClCompile Include="MarqueeScreen.cpp" />
@@ -145,6 +146,7 @@
     <ClInclude Include="ConfigurationManager.h" />
     <ClInclude Include="ConsoleManager.h" />
     <ClInclude Include="CoreWorker.h" />
+    <ClInclude Include="FlatMemoryAllocator.h" />
     <ClInclude Include="MainMenuScreen.h" />
     <ClInclude Include="MarqueeScreen.h" />
     <ClInclude Include="Process.h" />
