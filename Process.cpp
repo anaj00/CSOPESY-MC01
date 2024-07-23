@@ -24,7 +24,6 @@ int Process::getRemainingInstructions() const {
 	return totalInstructions - currentInstruction;
 }
 
-
 int Process::getCore() {
 	return core;
 }
@@ -44,6 +43,10 @@ std::string Process::getCreationTime() const {
 	char buffer[100];
 	std::strftime(buffer, sizeof(buffer), "%m/%d/%Y %I:%M:%S%p", &timeinfo);
 	return buffer;
+}
+
+int Process::getMemorySize() const {
+	return memorySize;
 }
 
 void Process::execute() {

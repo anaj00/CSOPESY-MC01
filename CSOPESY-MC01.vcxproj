@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -131,9 +131,12 @@
     <ClCompile Include="ConfigurationManager.cpp" />
     <ClCompile Include="ConsoleManager.cpp" />
     <ClCompile Include="CoreWorker.cpp" />
+    <ClCompile Include="FlatMemoryAllocator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenuScreen.cpp" />
     <ClCompile Include="MarqueeScreen.cpp" />
+    <ClCompile Include="MemoryManager.cpp" />
+    <ClCompile Include="PagingAllocator.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="ProcessScreen.cpp" />
     <ClCompile Include="Scheduler.cpp" />
@@ -143,8 +146,11 @@
     <ClInclude Include="ConfigurationManager.h" />
     <ClInclude Include="ConsoleManager.h" />
     <ClInclude Include="CoreWorker.h" />
+    <ClInclude Include="FlatMemoryAllocator.h" />
     <ClInclude Include="MainMenuScreen.h" />
     <ClInclude Include="MarqueeScreen.h" />
+    <ClInclude Include="MemoryManager.h" />
+    <ClInclude Include="PagingAllocator.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="ProcessScreen.h" />
     <ClInclude Include="Scheduler.h" />

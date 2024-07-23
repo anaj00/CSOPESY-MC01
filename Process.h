@@ -16,6 +16,7 @@ public:
 	void setCore(int coreID);
 	bool isFinished() const;
 	std::string getCreationTime() const;
+	int getMemorySize() const;
 
 	void execute();
 
@@ -27,5 +28,6 @@ private:
 	int core;
 	bool finished;
 	std::chrono::system_clock::time_point creationTime;
+	int memorySize;
 };
 
