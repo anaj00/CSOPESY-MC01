@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-CoreWorker::CoreWorker(int id, int delayPerExec, int quantumSlice) 
+CoreWorker::CoreWorker(int id, float delayPerExec, int quantumSlice) 
     : id(id), delayPerExec(delayPerExec), quantumSlice(quantumSlice), running(false), processAssigned(false) {}
 
 CoreWorker::~CoreWorker() {
@@ -27,7 +27,7 @@ void CoreWorker::runProcess() {
     if (quantumSlice == 0) {
         while (currentProcess && !currentProcess->isFinished()) {
             currentProcess->execute();
-            std::this_thread::sleep_for(std::chrono::milliseconds(delayPerExec));
+            std::this_thread::sleep_for(std::chrono::duration<float>(delayPerExec));
         }
 
         if (currentProcess && currentProcess->isFinished()) {
@@ -41,7 +41,7 @@ void CoreWorker::runProcess() {
                 return;
             }
             currentProcess->execute();
-            std::this_thread::sleep_for(std::chrono::milliseconds(delayPerExec));
+            std::this_thread::sleep_for(std::chrono::duration<float>(delayPerExec));
         }
 
         // Process is not finished, notify Scheduler
@@ -82,6 +82,7 @@ void CoreWorker::start() {
 }
 
 void CoreWorker::stop() {
+    running = false;
     {
         std::lock_guard<std::mutex> lock(coreMutex);
         running = false;

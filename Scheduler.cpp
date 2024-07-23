@@ -66,7 +66,7 @@ void Scheduler::initializeCoreWorkers() {
             cores.emplace_back(std::make_unique<CoreWorker>(i + 1, configManager->getDelayPerExec()));
             cores.back()->start();
         }
-        
+
     }
 }
 
@@ -90,6 +90,8 @@ void Scheduler::schedulerLoop() {
         else if (configManager->getSchedulerAlgorithm() == "rr") {
             scheduleRR();
         }
+
+        std::this_thread::sleep_for(std::chrono::duration<float>(configManager->getDelayPerExec()));
     }
 }
 

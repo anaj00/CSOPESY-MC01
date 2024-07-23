@@ -167,7 +167,7 @@ void ConsoleManager::stopSchedulerTest() {
 void ConsoleManager::schedulerTestLoop() {
 	while (schedulerTest) {
 		createProcess("process_" + std::to_string(processID));
-		std::this_thread::sleep_for(std::chrono::seconds(configManager.getBatchProcessFrequency()));
+		std::this_thread::sleep_for(std::chrono::duration<double>(configManager.getBatchProcessFrequency()));
 	}
 }
 

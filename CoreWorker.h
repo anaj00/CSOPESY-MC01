@@ -9,7 +9,7 @@
 class CoreWorker
 {
 public:
-    CoreWorker(int id, int delayPerExec, int quantumSlice = 0);
+    CoreWorker(int id, float delayPerExec, int quantumSlice = 0);
     ~CoreWorker();
 
     std::shared_ptr<Process> getCurrentProcess();
@@ -35,7 +35,7 @@ private:
     std::mutex coreMutex;
     std::shared_ptr<Process> currentProcess;
 
-    int delayPerExec = 0;
+    float delayPerExec = 0;
     int quantumSlice = 0;
 
     void run();
