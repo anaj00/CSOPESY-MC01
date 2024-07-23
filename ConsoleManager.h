@@ -30,8 +30,7 @@ public:
 
 	Scheduler& getScheduler(); // Function to get the scheduler
 	void createProcessScreen(const std::string processName); // Function to create a process screen)
-	void createProcess(const std::string processName); // Function to create a process screen)
-
+	void createProcess(const std::string processName); // Function to create a process screen
 
 	void startSchedulerTest();
 	void stopSchedulerTest();

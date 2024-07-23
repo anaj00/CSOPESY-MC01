@@ -41,7 +41,7 @@ std::string ConfigurationManager::getSchedulerAlgorithm() const {
 	return schedulerAlgorithm.substr(firstQuote + 1, secondQuote - firstQuote - 1);
 }
 
-int ConfigurationManager::getQuantumCycles() const {
+float ConfigurationManager::getQuantumCycles() const {
 	return quantumCycles;
 }
 
@@ -49,20 +49,32 @@ bool ConfigurationManager::isPreemptive() const {
 	return preemptive;
 }
 
-int ConfigurationManager::getBatchProcessFrequency() const {
+float ConfigurationManager::getBatchProcessFrequency() const {
 	return batchProcessFrequency;
 }
 
-int ConfigurationManager::getMinInstructions() const {
+float ConfigurationManager::getMinInstructions() const {
 	return minInstructions;
 }
 
-int ConfigurationManager::getMaxInstructions() const {
+float ConfigurationManager::getMaxInstructions() const {
 	return maxInstructions;
 }
 
-int ConfigurationManager::getDelayPerExec() const {
+float ConfigurationManager::getDelayPerExec() const {
 	return delayPerExec;
+}
+
+float ConfigurationManager::getMaxOverallMemory() const {
+	return maxOverallMemory;
+}
+
+float ConfigurationManager::getMinMemoryPerProcess() const {
+	return minMemoryPerProcess;
+}
+
+float ConfigurationManager::getMaxMemoryPerProcess() const {
+	return maxMemoryPerProcess;
 }
 
 void ConfigurationManager::parseConfigFile() {
