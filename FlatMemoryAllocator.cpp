@@ -11,7 +11,7 @@ bool FlatMemoryAllocator::allocate(Process process) {
             block.isFree = false;
             processMemoryMap[process.getID()] = block.start;
             if (block.size > process.getMemorySize()) {
-                memoryBlocks.push_back({ block.start + process.getMemorySize(), block.size - process.memorySize, true });
+                memoryBlocks.push_back({ block.start + process.getMemorySize(), block.size - process.getMemorySize(), true});
             }
             block.size = process.getMemorySize();
             return true;

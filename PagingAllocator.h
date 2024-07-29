@@ -8,7 +8,7 @@
 class PagingAllocator
 {
 public:
-	PagingAllocator(int memorySize, int pageSize);
+	PagingAllocator(int memorySize);
 	bool allocate(Process process);
 	void deallocate(int pid);
 

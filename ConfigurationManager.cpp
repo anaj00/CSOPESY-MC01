@@ -77,6 +77,18 @@ float ConfigurationManager::getMaxMemoryPerProcess() const {
 	return maxMemoryPerProcess;
 }
 
+float ConfigurationManager::getMinPagePerProcess() const {
+	return minPagePerProcess;
+}
+
+float ConfigurationManager::getMaxPagePerProcess() const {
+	return maxPagePerProcess;
+}
+
+std::string ConfigurationManager::getMemoryManagerAlgorithm() const {
+	return memoryManagerAlgorithm;
+}
+
 void ConfigurationManager::parseConfigFile() {
 	std::ifstream configFile("config.txt");
 
@@ -128,10 +140,30 @@ void ConfigurationManager::parseConfigFile() {
 		} else if (key == "delay-per-exec") {
 			iss >> delayPerExec;
 
-		}
+		} else if (key == "max-overall-mem") {
+			iss >> maxOverallMemory;
+
+		} else if (key == "min-mem-per-proc") {
+			iss >> minMemoryPerProcess;
+
+		} else if (key == "max-mem-per-proc") {
+			iss >> maxMemoryPerProcess;
+
+		} else if (key == "min-page-per-proc"){
+			iss >> minPagePerProcess;
+
+		} else if (key == "max-page-per-proc"){
+			iss >> maxPagePerProcess;
+		} 
 	}
 
 	configFile.close();
+
+	if (minPagePerProcess == 1 && maxPagePerProcess == 1) {
+		memoryManagerAlgorithm == "flat";
+	} else {
+		memoryManagerAlgorithm == "paging";
+	}
 }
 
 void ConfigurationManager::printConfig() {
@@ -145,5 +177,11 @@ void ConfigurationManager::printConfig() {
 	std::cout << "min-ins: " << minInstructions << std::endl;
 	std::cout << "max-ins: " << maxInstructions << std::endl;
 	std::cout << "delay-per-exec: " << delayPerExec << std::endl;
+	std::cout << "max-overall-mem: " << maxOverallMemory << std::endl;
+	std::cout << "min-mem-per-proc: " << minMemoryPerProcess << std::endl;
+	std::cout << "max-mem-per-proc: " << maxMemoryPerProcess << std::endl;
+	std::cout << "min-page-per-proc: " << minPagePerProcess << std::endl;
+	std::cout << "max-page-per-proc: " << maxPagePerProcess << std::endl;
+	std::cout << "memory-manager: " << memoryManagerAlgorithm << std::endl; // "flat" or "paging"
 	std::cout << "--------------------------" << std::endl;
 }

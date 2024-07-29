@@ -1,10 +1,10 @@
 #include "PagingAllocator.h"
 
-PagingAllocator::PagingAllocator(int memorySize, int pageSize) 
-	: memory(memorySize / pageSize, -1), memorySize(memorySize), pageSize(pageSize) {}
+PagingAllocator::PagingAllocator(int memorySize) 
+	: memorySize(memorySize) {}
 
 bool PagingAllocator::allocate(Process process) {
-    int pagesNeeded = (process.getMemorySize() + pageSize - 1) / pageSize;
+    int pagesNeeded = (process.getMemorySize() + process.getPageSize() - 1) / process.getPageSize();
     std::vector<int> allocatedPages;
     for (int i = 0; i < memory.size(); ++i) {
         if (memory[i] == -1) {

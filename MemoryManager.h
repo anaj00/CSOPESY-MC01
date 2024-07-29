@@ -1,25 +1,22 @@
 #pragma once
 
+#include "ConfigurationManager.h"
 #include "Process.h"
 #include "FlatMemoryAllocator.h"
 #include "PagingAllocator.h"
 
-// Enum for memory allocation type
-enum AllocationType {
-	FLAT,
-	PAGING
-};
-
 class MemoryManager
 {
 public: 
-	MemoryManager(AllocationType type);
+	MemoryManager(ConfigurationManager* configManager);
 	bool allocate(Process process);
 	void deallocate (int pid);
 
 private: 
+	ConfigurationManager* configManager;
+
 	FlatMemoryAllocator flatAllocator;
 	PagingAllocator pagingAllocator;
-	AllocationType allocationType;
+	std::string allocationType;
 };
 

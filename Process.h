@@ -16,18 +16,22 @@ public:
 	void setCore(int coreID);
 	bool isFinished() const;
 	std::string getCreationTime() const;
-	int getMemorySize() const;
+	float getMemorySize() const;
+	float getPageSize() const;
 
 	void execute();
 
 private:
 	std::string processName;
 	int id;
+	int core;
+	std::chrono::system_clock::time_point creationTime;
+
+	bool finished;
 	int currentInstruction;
 	int totalInstructions;
-	int core;
-	bool finished;
-	std::chrono::system_clock::time_point creationTime;
-	int memorySize;
+	
+	float memorySize;
+	float pageSize;
 };
 

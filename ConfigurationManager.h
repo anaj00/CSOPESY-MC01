@@ -23,6 +23,9 @@ public:
 	float getMaxOverallMemory() const; // Returns the maximum overall memory
 	float getMinMemoryPerProcess() const; // Returns the minimum memory per process
 	float getMaxMemoryPerProcess() const; // Returns the maximum memory per process
+	float getMinPagePerProcess() const; // Returns the minimum number of pages per process
+	float getMaxPagePerProcess() const; // Returns the maximum number of pages per process
+	std::string getMemoryManagerAlgorithm() const; // Returns the memory manager algorithm
 
 private:
 	void parseConfigFile();	// Parses the config file and sets the configuration values
@@ -41,5 +44,8 @@ private:
 	float maxOverallMemory;
 	float minMemoryPerProcess;
 	float maxMemoryPerProcess;
+	float minPagePerProcess;
+	float maxPagePerProcess;
+	std::string memoryManagerAlgorithm;
 };
 
