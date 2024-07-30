@@ -1,8 +1,12 @@
 #include "FlatMemoryAllocator.h"
 #include <iostream>
 
-FlatMemoryAllocator::FlatMemoryAllocator(int memorySize) : memorySize(memorySize) {
-    memoryBlocks.push_back({ 0, memorySize, true });
+FlatMemoryAllocator::FlatMemoryAllocator()  {
+}
+
+void FlatMemoryAllocator::initialize(ConfigurationManager* configManager) {
+    configManager = configManager;
+    memoryBlocks.push_back({ 0, (int) configManager->getMaxOverallMemory(), true});
 }
 
 bool FlatMemoryAllocator::allocate(Process process) {
@@ -11,7 +15,7 @@ bool FlatMemoryAllocator::allocate(Process process) {
             block.isFree = false;
             processMemoryMap[process.getID()] = block.start;
             if (block.size > process.getMemorySize()) {
-                memoryBlocks.push_back({ block.start + process.getMemorySize(), block.size - process.getMemorySize(), true});
+                memoryBlocks.push_back({ block.start + ((int) process.getMemorySize()), block.size - ((int) process.getMemorySize()), true});
             }
             block.size = process.getMemorySize();
             return true;

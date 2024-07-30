@@ -6,7 +6,7 @@
 #include "ConfigurationManager.h"
 
 ConfigurationManager::ConfigurationManager()
-	: numCPU(0), quantumCycles(0), preemptive(false), batchProcessFrequency(0), minInstructions(0), maxInstructions(0), delayPerExec(0)
+	: numCPU(0), quantumCycles(0), preemptive(false), batchProcessFrequency(0), minInstructions(0), maxInstructions(0), delayPerExec(0), maxOverallMemory(0), minMemoryPerProcess(0), maxMemoryPerProcess(0), minPagePerProcess(0), maxPagePerProcess(0), memoryManagerAlgorithm("")
 {}
 
 ConfigurationManager::~ConfigurationManager()
@@ -160,9 +160,9 @@ void ConfigurationManager::parseConfigFile() {
 	configFile.close();
 
 	if (minPagePerProcess == 1 && maxPagePerProcess == 1) {
-		memoryManagerAlgorithm == "flat";
+		memoryManagerAlgorithm = "flat";
 	} else {
-		memoryManagerAlgorithm == "paging";
+		memoryManagerAlgorithm = "paging";
 	}
 }
 

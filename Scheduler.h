@@ -39,7 +39,6 @@ private:
     std::mutex queueMutex;   // Protects access to the readyQueue
 
     bool running;
-    bool isTestRunning;
 
     void initializeCoreWorkers();
     int getAvailableCoreWorkerID();
@@ -49,6 +48,7 @@ private:
     void schedulePreemptiveSJF();
     void scheduleRR();
 
+    bool isTestRunning;
     std::thread schedulerThread;
     void schedulerLoop();
 };

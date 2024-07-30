@@ -1,5 +1,8 @@
 #pragma once
 
+#include <thread>
+#include <atomic>
+#include <iostream>
 #include "ConfigurationManager.h"
 #include "Process.h"
 #include "FlatMemoryAllocator.h"
@@ -7,16 +10,24 @@
 
 class MemoryManager
 {
-public: 
-	MemoryManager(ConfigurationManager* configManager);
-	bool allocate(Process process);
-	void deallocate (int pid);
+public:
+    MemoryManager();
+    ~MemoryManager();
 
-private: 
-	ConfigurationManager* configManager;
+    bool initialize(ConfigurationManager* configManager);
+    bool allocate(Process process);
+    void deallocate(int pid);
 
-	FlatMemoryAllocator flatAllocator;
-	PagingAllocator pagingAllocator;
-	std::string allocationType;
+    void stop(); // Method to stop the thread
+
+private:
+    void run(); // Method that the thread will execute
+
+    ConfigurationManager* configManager;
+    FlatMemoryAllocator flatAllocator;
+    PagingAllocator pagingAllocator;
+    std::string allocationType;
+
+    std::thread memoryThread;
+    std::atomic<bool> running;
 };
-

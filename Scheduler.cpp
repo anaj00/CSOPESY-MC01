@@ -8,7 +8,7 @@
 #include <optional>
 
 
-Scheduler::Scheduler() : running(false), isTestRunning(false) {}
+Scheduler::Scheduler() : running(false) {}
 
 Scheduler::~Scheduler() {
     stop();

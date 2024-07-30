@@ -49,7 +49,6 @@ void MainMenuScreen::displayHeader(){
 void MainMenuScreen::handleCommand(string command) {
     if (command == "exit") {
         std::cout << "Exiting the program..." << std::endl;
-		consoleManager.getScheduler().stop();
         exit(0);
         std::terminate();
 
@@ -75,7 +74,7 @@ void MainMenuScreen::handleCommand(string command) {
                     std::cout << "Command not recognized! Please provide a process name." << std::endl;
                 }
                 else {
-                    if (!consoleManager.ifProcessExists(processName)) {
+                    if (!consoleManager.getResourceManager().processExists(processName)) {
                         consoleManager.createProcessScreen(processName);
                     }
                     else {
@@ -103,15 +102,15 @@ void MainMenuScreen::handleCommand(string command) {
 
         } else if (command.substr(0, 9) == "scheduler") {
             if (command.substr(10) == "test") {
-                consoleManager.startSchedulerTest();
+                //consoleManager.startSchedulerTest();
             }
             else if (command.substr(10) == "stop") {
-                consoleManager.stopSchedulerTest();
+                //consoleManager.stopSchedulerTest();
             } else {
                 std::cout << "Invalid command.Please try again." << std::endl;
             }
         } else if (command == "report-util") {
-            consoleManager.getScheduler().saveReport();
+            consoleManager.getResourceManager().getScheduler()->saveReport();
 
 		} else if (command == "help") {
 			std::cout << "\nCommands:" << std::endl;

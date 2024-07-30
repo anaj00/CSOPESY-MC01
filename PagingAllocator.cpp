@@ -1,7 +1,11 @@
 #include "PagingAllocator.h"
 
-PagingAllocator::PagingAllocator(int memorySize) 
-	: memorySize(memorySize) {}
+PagingAllocator::PagingAllocator() {}
+
+void PagingAllocator::initialize(ConfigurationManager* configManager) {
+    configManager = configManager;
+	memory.resize(configManager->getMaxOverallMemory(), -1);
+}
 
 bool PagingAllocator::allocate(Process process) {
     int pagesNeeded = (process.getMemorySize() + process.getPageSize() - 1) / process.getPageSize();

@@ -1,7 +1,7 @@
 #include "Process.h"
 #include <iostream>
 
-Process::Process(std::string name, int id, int totalInstructions)
+Process::Process(std::string name, int id, float totalInstructions, float memorySize, float pageSize)
 	: processName(name), id(id), currentInstruction(0), totalInstructions(totalInstructions), core(-1), finished(false), creationTime(std::chrono::system_clock::now()){}
 
 std::string Process::getName() const {
@@ -12,15 +12,15 @@ int Process::getID() const {
 	return id;
 }
 
-int Process::getCurrentInstruction() const {
+float Process::getCurrentInstruction() const {
 	return currentInstruction;
 }
 
-int Process::getTotalInstructions() const {
+float Process::getTotalInstructions() const {
 	return totalInstructions;
 }
 
-int Process::getRemainingInstructions() const {
+float Process::getRemainingInstructions() const {
 	return totalInstructions - currentInstruction;
 }
 

@@ -1,18 +1,39 @@
+#include <iostream>
+
 #include "MemoryManager.h"
 
 
-MemoryManager::MemoryManager(ConfigurationManager* configManager)
-    : configManager(configManager),
-    flatAllocator(configManager->getMemoryManagerAlgorithm() == "flat" ? FlatMemoryAllocator(configManager->getMaxOverallMemory()) : FlatMemoryAllocator()), // Correctly initialize here
-    pagingAllocator(configManager->getMemoryManagerAlgorithm() == "paging" ? PagingAllocator(configManager->getMaxOverallMemory()) : PagingAllocator()) // Correctly initialize here
-{
-    if (configManager->getMemoryManagerAlgorithm() == "flat") {
-        allocationType = "flat";
-    }
-    else if (configManager->getMemoryManagerAlgorithm() == "paging") {
-        allocationType = "paging";
+MemoryManager::MemoryManager() : running(false) // Initialize running to false
+{}
+
+MemoryManager::~MemoryManager() {
+    stop();
+    if (memoryThread.joinable()) {
+        memoryThread.join();
     }
 }
+
+bool MemoryManager::initialize(ConfigurationManager* configManager) {
+    try {
+        this->configManager = configManager;
+        allocationType = configManager->getMemoryManagerAlgorithm();
+
+        if (allocationType == "flat") {
+            flatAllocator.initialize(configManager);
+        } else if (allocationType == "paging") {
+            pagingAllocator.initialize(configManager);
+        }
+
+        running = true;
+        memoryThread = std::thread(&MemoryManager::run, this);
+        return true;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error initializing memory manager: " << e.what() << std::endl;
+        return false;
+    }
+}
+
 
 bool MemoryManager::allocate(Process process) {
     if (allocationType == "flat") {
@@ -33,5 +54,19 @@ void MemoryManager::deallocate(int pid) {
     }
     else if (allocationType == "paging") {
         pagingAllocator.deallocate(pid);
+    }
+}
+
+void MemoryManager::stop() {
+    running = false;
+}
+
+void MemoryManager::run() {
+    while (running) {
+        // Perform periodic memory management tasks
+        // For example: Check memory status, handle requests, etc.
+
+        // Here, we'll just simulate work with sleep
+        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Adjust as needed
     }
 }

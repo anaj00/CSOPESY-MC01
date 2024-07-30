@@ -139,6 +139,7 @@
     <ClCompile Include="PagingAllocator.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="ProcessScreen.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Scheduler.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -153,6 +154,7 @@
     <ClInclude Include="PagingAllocator.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="ProcessScreen.h" />
+    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Scheduler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -32,9 +32,9 @@ void ConsoleManager::run()
 void ConsoleManager::switchScreen(const std::string consoleName) {
 	if (consoleName.substr(0, 15) == "PROCESS_SCREEN_") {
 		std::string processName = consoleName.substr(15);
-		std::shared_ptr<Process> process = scheduler.getProcessByName(processName);
 
-		if (process) {
+		if (resourceManager.processExists(processName)) {
+			std::shared_ptr<Process> process = resourceManager.findProcessByName(processName);
 			if (!process->isFinished()) {
 				previousConsole = currentConsole;
 				currentConsole = consoles[consoleName];
@@ -67,10 +67,8 @@ bool ConsoleManager::isInitialized() {
 }
 
 void ConsoleManager::setInitialized() {
-	if (configManager.initialize() && scheduler.initialize(&configManager)) {
+	if (configManager.initialize() && resourceManager.initialize(&configManager)) {
 		std::cout << "Initialization successful..." << std::endl;
-		std::thread schedulerThread(&Scheduler::run, &scheduler);
-		schedulerThread.detach();
 	}
 }
 
@@ -98,18 +96,14 @@ void ConsoleManager::returnToPreviousScreen() {
 	}
 }
 
-Scheduler& ConsoleManager::getScheduler() {
-	return scheduler;
+ResourceManager& ConsoleManager::getResourceManager() {
+	return resourceManager;
 }
 
 
 void ConsoleManager::createProcessScreen(const std::string processName) {
-	processID++;
-
-	// Create new process
-	Process newProcess(processName, processID, getRandomInstruction());
 	
-	std::shared_ptr<Process> processPointer = scheduler.addProcess(newProcess);
+	std::shared_ptr<Process> processPointer = resourceManager.createProcess(processName);
 
 	// Create new process screen
 	auto processScreen = std::make_shared<ProcessScreen>(processPointer);
@@ -121,68 +115,46 @@ void ConsoleManager::createProcessScreen(const std::string processName) {
 	switchScreen(processScreen->getName());
 }
 
-void ConsoleManager::createProcess(const std::string processName) {
-	processID++;
+//void ConsoleManager::startSchedulerTest() {
+//	std::lock_guard<std::mutex> lock(mtx);
+//	if (!schedulerTest) {
+//		schedulerTest = true;
+//		testThread = std::thread(&ConsoleManager::schedulerTestLoop, this);
+//	}
+//}
 
-	// Create new process
-	Process newProcess(processName, processID, getRandomInstruction());
+//void ConsoleManager::stopSchedulerTest() {
+//	{
+//		std::lock_guard<std::mutex> lock(mtx);
+//		if (schedulerTest) {
+//			schedulerTest = false;
+//		}
+//	}
+//	if (testThread.joinable()) {
+//		testThread.join();  // Ensure the thread is properly joined
+//	}
+//}
 
-	std::shared_ptr<Process> processPointer = scheduler.addProcess(newProcess);
-
-	// Create new process screen
-	auto processScreen = std::make_shared<ProcessScreen>(processPointer);
-
-	// Add process screen to console manager
-	addConsole(processScreen);
-}
-
-int ConsoleManager::getRandomInstruction() {
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> distr(configManager.getMinInstructions(), configManager.getMaxInstructions());
-	
-	return distr(gen);
-}
-
-void ConsoleManager::startSchedulerTest() {
-	std::lock_guard<std::mutex> lock(mtx);
-	if (!schedulerTest) {
-		schedulerTest = true;
-		testThread = std::thread(&ConsoleManager::schedulerTestLoop, this);
-	}
-}
-
-void ConsoleManager::stopSchedulerTest() {
-	{
-		std::lock_guard<std::mutex> lock(mtx);
-		if (schedulerTest) {
-			schedulerTest = false;
-		}
-	}
-	if (testThread.joinable()) {
-		testThread.join();  // Ensure the thread is properly joined
-	}
-}
-
-void ConsoleManager::schedulerTestLoop() {
-	while (schedulerTest) {
-		createProcess("process_" + std::to_string(processID));
-		std::this_thread::sleep_for(std::chrono::duration<double>(configManager.getBatchProcessFrequency()));
-	}
-}
+//void ConsoleManager::schedulerTestLoop() {
+//	while (schedulerTest) {
+//		createProcess("process_" + std::to_string(processID));
+//		std::this_thread::sleep_for(std::chrono::duration<double>(configManager.getBatchProcessFrequency()));
+//	}
+//}
 
 void ConsoleManager::displayStatus() {
-	scheduler.displayStatus();	
+	resourceManager.getScheduler()->displayStatus();
 }
 
 bool ConsoleManager::ifProcessExists(std::string name) {
 	bool flag;
-	if (scheduler.getProcessByName(name) == nullptr) return false;
+	if (resourceManager.getScheduler()->getProcessByName(name) == nullptr) return false;
 	return true;
 }
+
 bool ConsoleManager::isProcessFinished(std::string name) {
 	if (ifProcessExists(name)) {
-		std::shared_ptr<Process> foundProcess = scheduler.getProcessByName(name);
+		std::shared_ptr<Process> foundProcess = resourceManager.getScheduler()->getProcessByName(name);
 		return foundProcess->isFinished();
 	}
 	return false;

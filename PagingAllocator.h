@@ -4,18 +4,22 @@
 #include <unordered_map>
 
 #include "Process.h"
+#include "ConfigurationManager.h"
 
 class PagingAllocator
 {
 public:
-	PagingAllocator(int memorySize);
+	PagingAllocator();
+
+	void initialize(ConfigurationManager* configManager);
 	bool allocate(Process process);
 	void deallocate(int pid);
 
 private:
+	ConfigurationManager* configManager;
+
 	std::vector<int> memory; // memory represented as page frames
 	std::unordered_map<int, std::vector<int>> processPageTable; // map of process id to page frames
 	int memorySize;
-	int pageSize;
 };
 
