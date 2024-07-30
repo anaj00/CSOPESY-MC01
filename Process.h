@@ -9,9 +9,9 @@ public:
 
 	std::string getName() const;
 	int getID() const;
-	float getCurrentInstruction() const;
-	float getTotalInstructions() const;
-	float getRemainingInstructions() const;
+	int getCurrentInstruction() const;
+	int getTotalInstructions() const;
+	int getRemainingInstructions() const;
 	int getCore();
 	void setCore(int coreID);
 	bool isFinished() const;
@@ -19,7 +19,7 @@ public:
 	float getMemorySize() const;
 	float getPageSize() const;
 
-	void execute();
+	void execute(); // Executes one instruction
 
 private:
 	std::string processName;
@@ -29,8 +29,8 @@ private:
 	std::chrono::system_clock::time_point creationTime;
 
 	bool finished;
-	float currentInstruction;
-	float totalInstructions;
+	int currentInstruction;
+	int totalInstructions;
 	
 	float memorySize;
 	float pageSize;

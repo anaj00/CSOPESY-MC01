@@ -15,8 +15,8 @@ ConfigurationManager::~ConfigurationManager()
 bool ConfigurationManager::initialize()
 {
 	try {
-		parseConfigFile();
-		printConfig();
+		parseConfigFile(); // Parse the configuration file
+		printConfig(); // Print the configuration settings
 		initialized = true;
 		return true;
 
@@ -36,6 +36,7 @@ int ConfigurationManager::getNumCPU() const {
 }
 
 std::string ConfigurationManager::getSchedulerAlgorithm() const {
+	// "rr" or "fcfs" or "sjf"
 	size_t firstQuote = schedulerAlgorithm.find('\"');
 	size_t secondQuote = schedulerAlgorithm.find('\"', firstQuote + 1);
 	return schedulerAlgorithm.substr(firstQuote + 1, secondQuote - firstQuote - 1);
@@ -53,11 +54,11 @@ float ConfigurationManager::getBatchProcessFrequency() const {
 	return batchProcessFrequency;
 }
 
-float ConfigurationManager::getMinInstructions() const {
+int ConfigurationManager::getMinInstructions() const {
 	return minInstructions;
 }
 
-float ConfigurationManager::getMaxInstructions() const {
+int ConfigurationManager::getMaxInstructions() const {
 	return maxInstructions;
 }
 
@@ -105,6 +106,7 @@ void ConfigurationManager::parseConfigFile() {
 			continue; // Skip empty lines
 		}
 
+		// find key word
 		if (key == "num-cpu") {
 			iss >> numCPU;
 
@@ -159,6 +161,10 @@ void ConfigurationManager::parseConfigFile() {
 
 	configFile.close();
 
+	// Determine memory manager algorithm
+		// If min-page-per-proc and max-page-per-proc are 1, 
+		// then the memory manager must use a flat memory allocator. 
+		// If it’s >1, it’s a paging allocator
 	if (minPagePerProcess == 1 && maxPagePerProcess == 1) {
 		memoryManagerAlgorithm = "flat";
 	} else {

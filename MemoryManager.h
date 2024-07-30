@@ -13,6 +13,8 @@ class MemoryManager
 public:
     MemoryManager();
     ~MemoryManager();
+    FlatMemoryAllocator flatAllocator;
+    PagingAllocator pagingAllocator;
 
     bool initialize(ConfigurationManager* configManager);
     bool allocate(Process process);
@@ -24,8 +26,7 @@ private:
     void run(); // Method that the thread will execute
 
     ConfigurationManager* configManager;
-    FlatMemoryAllocator flatAllocator;
-    PagingAllocator pagingAllocator;
+    
     std::string allocationType;
 
     std::thread memoryThread;

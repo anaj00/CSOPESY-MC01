@@ -9,7 +9,7 @@
 class CoreWorker
 {
 public:
-    CoreWorker(int id, float delayPerExec, int quantumSlice = 0);
+    CoreWorker(int id, float delayPerExec, float quantumSlice = 0);
     ~CoreWorker();
 
     std::shared_ptr<Process> getCurrentProcess();
@@ -36,7 +36,7 @@ private:
     std::shared_ptr<Process> currentProcess;
 
     float delayPerExec = 0;
-    int quantumSlice = 0;
+    float quantumSlice = 0;
 
     void run();
     std::function<void(std::shared_ptr<Process>)> processCompletionCallback;

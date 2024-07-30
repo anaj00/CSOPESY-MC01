@@ -23,18 +23,25 @@ ConsoleManager::~ConsoleManager()
 }
 
 void ConsoleManager::run()
-{
+{	
+	// Main loop
 	if (currentConsole) {
 		currentConsole->onExecute();
 	}
 }
 
 void ConsoleManager::switchScreen(const std::string consoleName) {
+
+	// For process screens
 	if (consoleName.substr(0, 15) == "PROCESS_SCREEN_") {
 		std::string processName = consoleName.substr(15);
 
 		if (resourceManager.processExists(processName)) {
+			
+			// Check if process is finished
 			std::shared_ptr<Process> process = resourceManager.findProcessByName(processName);
+			
+			
 			if (!process->isFinished()) {
 				previousConsole = currentConsole;
 				currentConsole = consoles[consoleName];
@@ -49,6 +56,8 @@ void ConsoleManager::switchScreen(const std::string consoleName) {
 			std::cerr << "Process " << processName << " not found." << std::endl;
 		}
 	}
+
+	// For non-process screens
 	else {
 		if (consoles.find(consoleName) != consoles.end()) {
 			previousConsole = currentConsole;
@@ -60,10 +69,6 @@ void ConsoleManager::switchScreen(const std::string consoleName) {
 			std::cerr << "Console " << consoleName << " not found." << std::endl;
 		}
 	}
-}
-
-bool ConsoleManager::isInitialized() {
-	return configManager.isInitialized();
 }
 
 void ConsoleManager::setInitialized() {
@@ -102,7 +107,7 @@ ResourceManager& ConsoleManager::getResourceManager() {
 
 
 void ConsoleManager::createProcessScreen(const std::string processName) {
-	
+	// Create new process
 	std::shared_ptr<Process> processPointer = resourceManager.createProcess(processName);
 
 	// Create new process screen
@@ -112,7 +117,7 @@ void ConsoleManager::createProcessScreen(const std::string processName) {
 	addConsole(processScreen);
 
 	// Switch to process screen
-	switchScreen(processScreen->getName());
+	//switchScreen(processScreen->getName());
 }
 
 //void ConsoleManager::startSchedulerTest() {
@@ -143,6 +148,7 @@ void ConsoleManager::createProcessScreen(const std::string processName) {
 //}
 
 void ConsoleManager::displayStatus() {
+	// TODO: Create new displayStatus() method in ResourceManager
 	resourceManager.getScheduler()->displayStatus();
 }
 
@@ -157,5 +163,6 @@ bool ConsoleManager::isProcessFinished(std::string name) {
 		std::shared_ptr<Process> foundProcess = resourceManager.getScheduler()->getProcessByName(name);
 		return foundProcess->isFinished();
 	}
+
 	return false;
 }

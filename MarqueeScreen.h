@@ -10,7 +10,7 @@ public:
 	MarqueeScreen();
 	~MarqueeScreen();
 
-	void onExecute() override;
+	void onExecute() override; // Main loop
 	void display() override;
 	void process() override;
 

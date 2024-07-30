@@ -18,6 +18,7 @@ bool MemoryManager::initialize(ConfigurationManager* configManager) {
         this->configManager = configManager;
         allocationType = configManager->getMemoryManagerAlgorithm();
 
+        // Initialize the memory allocator based on the configuration
         if (allocationType == "flat") {
             flatAllocator.initialize(configManager);
         } else if (allocationType == "paging") {
@@ -25,7 +26,7 @@ bool MemoryManager::initialize(ConfigurationManager* configManager) {
         }
 
         running = true;
-        memoryThread = std::thread(&MemoryManager::run, this);
+        memoryThread = std::thread(&MemoryManager::run, this); // Start the memory manager thread
         return true;
     }
     catch (const std::exception& e) {
@@ -37,14 +38,19 @@ bool MemoryManager::initialize(ConfigurationManager* configManager) {
 
 bool MemoryManager::allocate(Process process) {
     if (allocationType == "flat") {
-        if (!flatAllocator.allocate(process)) {
+        if (!flatAllocator.allocate(process)) { 
+            // If allocation fails, swap out a random process and try again
+
             flatAllocator.swapOutRandomProcess();
             return flatAllocator.allocate(process);
-        }
+        } else {
+			return true;
+		}
     }
     else if (allocationType == "paging") {
         return pagingAllocator.allocate(process);
-    }
+    } 
+
     return false;
 }
 

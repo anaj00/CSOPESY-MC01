@@ -12,15 +12,15 @@ int Process::getID() const {
 	return id;
 }
 
-float Process::getCurrentInstruction() const {
+int Process::getCurrentInstruction() const {
 	return currentInstruction;
 }
 
-float Process::getTotalInstructions() const {
+int Process::getTotalInstructions() const {
 	return totalInstructions;
 }
 
-float Process::getRemainingInstructions() const {
+int Process::getRemainingInstructions() const {
 	return totalInstructions - currentInstruction;
 }
 
@@ -54,9 +54,9 @@ float Process::getPageSize() const {
 }
 
 void Process::execute() {
-	if (currentInstruction < totalInstructions) {
-		currentInstruction++;
+	if (currentInstruction < totalInstructions) { // If the process has not finished executing
+		currentInstruction++; // Increment the current instruction
 	} else {
-		finished = true;
+		finished = true; // Set the process to finished
 	}
 }

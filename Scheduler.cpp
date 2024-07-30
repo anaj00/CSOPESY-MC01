@@ -20,15 +20,13 @@ Scheduler::~Scheduler() {
     }
 }
 
-std::shared_ptr<Process> Scheduler::addProcess(const Process& process) {
+void Scheduler::addProcess(const Process& process) {
     std::lock_guard<std::mutex> lock(processMutex);
     auto newProcess = std::make_shared<Process>(process);
     processes.push_back(newProcess);
 
     std::lock_guard<std::mutex> queueLock(queueMutex);
     readyQueue.push(newProcess);
-
-    return newProcess;
 }
 
 
@@ -47,6 +45,7 @@ bool Scheduler::initialize(ConfigurationManager* newConfigManager) {
         configManager = newConfigManager;
         initializeCoreWorkers();
         running = true;
+        run();
         return true;
     }
     catch (const std::exception& e) {
@@ -100,6 +99,7 @@ void Scheduler::stop() {
 }
 
 void Scheduler::displayStatus() {
+    // TODO: Remove this and integrate to Resource Manager
     std::lock_guard<std::mutex> lock(processMutex);
 
     int coresUsed = 0;
@@ -155,6 +155,7 @@ void Scheduler::displayStatus() {
 
 
 void Scheduler::saveReport() {
+    // TODO: Remove this and integrate to Resource Manager
     std::cout << "Saving report..." << std::endl;
 
     std::ofstream file("csopesy-log.txt");
@@ -293,36 +294,37 @@ void Scheduler::schedulePreemptiveSJF() {
         std::lock_guard<std::mutex> lock(queueMutex);
         if (!readyQueue.empty()) {
 
-            // Sort the ready queue by remaining instructions
+            // Move all processes from readyQueue to sortedProcesses vector
             std::vector<std::shared_ptr<Process>> sortedProcesses;
             while (!readyQueue.empty()) {
                 sortedProcesses.push_back(readyQueue.front());
                 readyQueue.pop();
             }
 
+            // Sort the processes by remaining instructions (Shortest Job First)
             std::sort(sortedProcesses.begin(), sortedProcesses.end(), [](const std::shared_ptr<Process>& a, const std::shared_ptr<Process>& b) {
                 return a->getRemainingInstructions() < b->getRemainingInstructions();
                 });
 
-            // Assign sorted processes to available cores or preempt if necessary
+            // Try to assign sorted processes to available cores or preempt if necessary
             for (auto& process : sortedProcesses) {
-                auto coreID = getAvailableCoreWorkerID();
+                auto coreID = getAvailableCoreWorkerID(); // Get the first available core
 
-                if (coreID > 0) {
+                if (coreID > 0) { // There is an available core
                     process->setCore(coreID);
                     cores[coreID - 1]->setProcess(process);
                 }
-                else {
-                    // Check for preemption
+
+                else { // No available core
                     bool preempted = false;
                     for (auto& core : cores) {
                         auto runningProcess = core->getCurrentProcess();
                         if (runningProcess && runningProcess->getRemainingInstructions() > process->getRemainingInstructions()) {
                             
                             // Preempt the current process
-                            readyQueue.push(runningProcess);
-                            process->setCore(core->getID());
-                            core->setProcess(process);
+                            readyQueue.push(runningProcess); // Push the running process back to the ready queue
+                            process->setCore(core->getID()); // Assign the new process to the core
+                            core->setProcess(process); 
                             preempted = true;
                             break;
                         }

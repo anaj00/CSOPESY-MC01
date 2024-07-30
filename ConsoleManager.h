@@ -21,7 +21,6 @@ public:
 	void run(); // Function to run the console
 	void switchScreen(std::string consoleName); // Function to switch the console)
 
-	bool isInitialized(); // Function to check if the console is initialized
 	void setInitialized(); // Function to set the console as initialized
 	ConfigurationManager& getConfigurationManager(); // Function to get the configuration manager
 
@@ -48,10 +47,10 @@ private:
 	std::shared_ptr<AConsole> currentConsole; // Pointer to the current console
 
 	int processID = 0; // Process ID Tracker
-
-	//std::atomic<bool> schedulerTest{ false };
 	std::thread testThread;
 	std::mutex mtx;
+
+	//std::atomic<bool> schedulerTest{ false };
 	//void schedulerTestLoop();
 };
 

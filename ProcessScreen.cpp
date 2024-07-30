@@ -52,7 +52,7 @@ bool ProcessScreen::handleCommand(string command) {
         consoleManager.returnToPreviousScreen();
         return false;
     }
-    else if (command == "process-smi") {
+    else if (command == "process-smi") { // Redraws the screen
         onExecute();
         return true;
     }

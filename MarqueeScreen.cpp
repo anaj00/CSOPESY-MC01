@@ -12,7 +12,6 @@ extern ConsoleManager consoleManager;
 
 MarqueeScreen::MarqueeScreen()
 	: AConsole("MARQUEE_SCREEN") {
-
 }
 
 MarqueeScreen::~MarqueeScreen() {

@@ -10,9 +10,9 @@ class ProcessScreen : public AConsole
 public:
 	ProcessScreen(std::shared_ptr<Process> myProcess);
 
-	void onExecute() override;
+	void onExecute() override; // Main loop
 	void display() override;
-	void process() override;
+	void process() override; // Handle commands
 
 private:
 	void displayHeader();

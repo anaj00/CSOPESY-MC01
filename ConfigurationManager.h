@@ -17,8 +17,8 @@ public:
 	float getQuantumCycles() const; // Returns the quantum cycles
 	bool isPreemptive() const; // Returns true if the scheduler is preemptive
 	float getBatchProcessFrequency() const; // Returns the batch process frequency
-	float getMinInstructions() const; // Returns the minimum number of instructions a process can have
-	float getMaxInstructions() const; // Returns the maximum number of instructions a process can have
+	int getMinInstructions() const; // Returns the minimum number of instructions a process can have
+	int getMaxInstructions() const; // Returns the maximum number of instructions a process can have
 	float getDelayPerExec() const; // Returns the delay per execution
 	float getMaxOverallMemory() const; // Returns the maximum overall memory
 	float getMinMemoryPerProcess() const; // Returns the minimum memory per process
@@ -38,8 +38,8 @@ private:
 	float quantumCycles;
 	bool preemptive;
 	float batchProcessFrequency;
-	float minInstructions;
-	float maxInstructions;
+	int minInstructions;
+	int maxInstructions;
 	float delayPerExec;
 	float maxOverallMemory;
 	float minMemoryPerProcess;

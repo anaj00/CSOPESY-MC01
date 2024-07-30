@@ -7,7 +7,6 @@ extern ConsoleManager consoleManager;
 
 MainMenuScreen::MainMenuScreen()
 	: AConsole("MAIN_MENU"){
-
 }
 
 MainMenuScreen::~MainMenuScreen(){
@@ -52,10 +51,10 @@ void MainMenuScreen::handleCommand(string command) {
         exit(0);
         std::terminate();
 
-    } else if (command == "initialize" && !consoleManager.isInitialized()) {
+    } else if (command == "initialize" && !consoleManager.getConfigurationManager().isInitialized()) {
         consoleManager.setInitialized();
 
-	} else if (consoleManager.isInitialized()) {
+	} else if (consoleManager.getConfigurationManager().isInitialized()) {
         if (command == "clear" || command == "cls") {
             system("cls");
 
@@ -70,14 +69,15 @@ void MainMenuScreen::handleCommand(string command) {
             else if (command.substr(0,9) == "screen -s") { 
                 std::string processName = command.substr(10);
                 trim(processName);
-                if (processName.empty()){
+                if (processName.empty()){ // if the process name is empty
                     std::cout << "Command not recognized! Please provide a process name." << std::endl;
                 }
-                else {
-                    if (!consoleManager.getResourceManager().processExists(processName)) {
+
+                else { // if the process name is not empty
+                    if (!consoleManager.getResourceManager().processExists(processName)) { // if the process does not exist, create process
                         consoleManager.createProcessScreen(processName);
                     }
-                    else {
+                    else { // if the process already exists
                         std::cout << "Process already exists or has existed. Please provide a different name." << std::endl;
                     }
                    
@@ -87,29 +87,36 @@ void MainMenuScreen::handleCommand(string command) {
             else if (command.substr(0,9) == "screen -r") {
                 std::string processName = command.substr(10);
                 trim(processName);
-                if (processName.empty()) {
+
+                if (processName.empty()) { // if the process name is empty
                     std::cout << "Command not recognized! Please provide a process name." << std::endl;
                 }
+
                 else {
-                    if (consoleManager.isProcessFinished(processName)) {
+                    if (consoleManager.isProcessFinished(processName)) { // if the process is finished, there will be no screen
                         std::cout << "Process " << processName << " not found." << std::endl;
                     }
-                    else {
+                    else { // if the process is not finished, switch to the screen
                         consoleManager.switchScreen("PROCESS_SCREEN_" + processName);
                     }
                 }
             }
 
         } else if (command.substr(0, 9) == "scheduler") {
-            if (command.substr(10) == "test") {
+            if (command.substr(10) == "test") { // TODO: Implement new scheduler test
                 //consoleManager.startSchedulerTest();
             }
-            else if (command.substr(10) == "stop") {
+
+            else if (command.substr(10) == "stop") { // TODO: Implement new scheduler stop
                 //consoleManager.stopSchedulerTest();
-            } else {
+            } 
+
+            else {
                 std::cout << "Invalid command.Please try again." << std::endl;
             }
+
         } else if (command == "report-util") {
+            // TODO: Implement new report utility with memory details
             consoleManager.getResourceManager().getScheduler()->saveReport();
 
 		} else if (command == "help") {
@@ -139,14 +146,12 @@ void MainMenuScreen::ltrim(std::string& s) {
         }));
 }
 
-// Function to trim whitespace from the end (in place)
 void MainMenuScreen::rtrim(std::string& s) {
     s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
         return !std::isspace(ch);
         }).base(), s.end());
 }
 
-// Function to trim whitespace from both ends (in place)
 void MainMenuScreen::trim(std::string& s) {
     ltrim(s);
     rtrim(s);

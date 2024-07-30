@@ -18,15 +18,15 @@ public:
     Scheduler();
     ~Scheduler();
 
-    std::shared_ptr<Process> addProcess(const Process& process);
+    void addProcess(const Process& process); // Add a process to the ready queue
     std::shared_ptr<Process> getProcessByName(const std::string name);
 
-    bool initialize(ConfigurationManager* newConfigManager);
-    void run();
+    bool initialize(ConfigurationManager* newConfigManager); // Initialize the scheduler with a configuration manager
+    void run(); // Start the scheduler
     void stop();
 
     void displayStatus();
-    void saveReport();
+    void saveReport(); 
 
 private:
     ConfigurationManager* configManager;
@@ -40,7 +40,7 @@ private:
 
     bool running;
 
-    void initializeCoreWorkers();
+    void initializeCoreWorkers(); // Initialize the cores
     int getAvailableCoreWorkerID();
 
     void scheduleFCFS();
@@ -50,5 +50,5 @@ private:
 
     bool isTestRunning;
     std::thread schedulerThread;
-    void schedulerLoop();
+    void schedulerLoop(); // Main loop for the scheduler
 };
