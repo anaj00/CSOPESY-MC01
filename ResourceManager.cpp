@@ -223,3 +223,49 @@ void ResourceManager::displayStatus() {
 
 	std::cout << "--------------------------------------------\n";
 }
+
+
+void ResourceManager::displayProcessSmi() {
+	std::cout << "--------------------------------------------\n";
+	std::cout << "| PROCESS-SMI V01.00 Driver Version 01.00 | \n";
+	std::cout << "--------------------------------------------\n";
+	std::cout << "CPU-Util: " << this->getCPUUtilization() << "%\n";
+	std::cout << "Memory Usage: " << memoryManager.flatAllocator.getUsedMemory() << "/" << configManager->getMaxOverallMemory()  << "\n";
+	std::cout << "Memory-Util: "<< this->getMemoryUtilization() << "%" << "%\n";
+	std::cout << "============================================	\n";
+	std::cout << "Running processes and memory usage: \n";
+	std::cout << "--------------------------------------------\n";
+
+	const std::vector<std::shared_ptr<Process>>& processes = scheduler.getProcesses();
+	for (const auto& process : processes) {
+		if (!process->isFinished() && process->getCore() != -1) {
+			std::cout << std::left << std::setw(20) << process->getName()
+				<< std::left << std::setw(30) << process->getMemorySize() << std::endl;
+		}
+	}
+	std::cout << "--------------------------------------------\n";
+}
+
+
+int ResourceManager::getCPUUtilization() {
+	int coresUsed = 0;
+	const std::vector<std::unique_ptr<CoreWorker>>& cores = scheduler.getCoreWorkers();
+	for (const auto& core : cores) {
+		if (core->isAssignedProcess()) {
+			coresUsed++;
+		}
+	}
+
+	int totalCores = configManager->getNumCPU();
+	int cpuUtilization = totalCores ? (coresUsed * 100 / totalCores) : 0;
+
+	return cpuUtilization;
+}
+
+int ResourceManager::getMemoryUtilization() {
+	int usedMemory = memoryManager.flatAllocator.getUsedMemory();
+	int totalMemory = configManager->getMaxOverallMemory();
+	int memoryUtilization = totalMemory ? (usedMemory * 100 / totalMemory) : 0;
+	return memoryUtilization;
+}
+

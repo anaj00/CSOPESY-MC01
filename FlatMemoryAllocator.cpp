@@ -98,5 +98,16 @@ void FlatMemoryAllocator::displayMemory() {
         std::cout << "Start: " << block.start << ", Size: " << block.size
             << ", Status: " << (block.isFree ? "Free" : "Allocated") << std::endl;
     }
+
+}
+
+int FlatMemoryAllocator::getUsedMemory() {
+    int usedMemory = 0;
+    for (const auto& block : memoryBlocks) {
+        if (!block.isFree) {
+            usedMemory += block.size;
+        }
+    }
+    return usedMemory;
 }
 

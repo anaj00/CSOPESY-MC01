@@ -35,7 +35,7 @@ public:
     void displayStatus();
 
     // process-smi
-
+    void displayProcessSmi();
 private:
     ConfigurationManager* configManager;
     MemoryManager memoryManager;
@@ -62,4 +62,6 @@ private:
 
     void schedulerTestLoop();
 
+    int getCPUUtilization();
+    int getMemoryUtilization();
 };

@@ -129,7 +129,9 @@ void MainMenuScreen::handleCommand(string command) {
 			std::cout << "scheduler-stop - Stop the scheduler test" << std::endl;
 			std::cout << "report-util - Save the report" << std::endl;
 			std::cout << "exit - Exit the program" << std::endl;
-		}
+		} else if (command == "process-smi") {
+            consoleManager.getResourceManager().displayProcessSmi();
+        }
 
         else {
             std::cout << "Invalid command. Please try again." << std::endl;
