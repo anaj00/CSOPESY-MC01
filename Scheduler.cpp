@@ -374,3 +374,11 @@ void Scheduler::scheduleRR() {
         }
     }
 }
+
+const std::vector<std::unique_ptr<CoreWorker>>& Scheduler::getCoreWorkers() const {
+    return cores;
+}
+
+const std::vector<std::shared_ptr<Process>>& Scheduler::getProcesses() const {
+    return processes;
+}

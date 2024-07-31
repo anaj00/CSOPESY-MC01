@@ -55,7 +55,7 @@ void FlatMemoryAllocator::swapOutRandomProcess() {
         int randIndex = rand() % processMemoryMap.size(); // get random index
         auto it = processMemoryMap.begin(); // get iterator to random index
         std::advance(it, randIndex); // advance iterator to random index
-        std::cout << "Swapping out process with PID: " << it->first << std::endl;
+        //std::cout << "Swapping out process with PID: " << it->first << std::endl;
         deallocate(it->first);
     }
 }

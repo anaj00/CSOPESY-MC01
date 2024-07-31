@@ -3,6 +3,7 @@
 #include "MemoryManager.h"
 #include "Scheduler.h"
 #include "ConfigurationManager.h"
+#include "Process.h"
 
 #include <vector>
 #include <memory>
@@ -29,6 +30,11 @@ public:
     // Scheduler test
     void startSchedulerTest();
     void stopSchedulerTest();
+
+    // Display Status
+    void displayStatus();
+
+    // process-smi
 
 private:
     ConfigurationManager* configManager;

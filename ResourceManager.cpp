@@ -5,6 +5,7 @@
 #include <random>
 #include <algorithm>
 #include <thread>
+#include <iomanip>
 
 ResourceManager::ResourceManager() : processCounter(0) {
 	srand(static_cast<unsigned int>(time(0))); // Seed the random number generator
@@ -168,4 +169,59 @@ void ResourceManager::schedulerTestLoop() {
 		createProcess("process_test" + std::to_string(processID));
 		std::this_thread::sleep_for(std::chrono::duration<double>(configManager->getBatchProcessFrequency()));
 	}
+}
+
+void ResourceManager::displayStatus() {
+	std::lock_guard<std::mutex> lock(processMutex);
+
+	int coresUsed = 0;
+	const std::vector<std::unique_ptr<CoreWorker>>& cores = scheduler.getCoreWorkers();
+	for (const auto& core : cores) {
+		if (core->isAssignedProcess()) {
+			coresUsed++;
+		}
+	}
+
+	int totalCores = configManager->getNumCPU();
+	int cpuUtilization = totalCores ? (coresUsed * 100 / totalCores) : 0;
+
+	std::cout << "CPU utilization: " << cpuUtilization << "%\n";
+	std::cout << "Cores used: " << coresUsed << "\n";
+	std::cout << "Cores available: " << totalCores - coresUsed << "\n";
+	std::cout << "--------------------------------------------\n";
+
+	std::cout << "Running processes:\n";
+	const std::vector<std::shared_ptr<Process>>& processes = scheduler.getProcesses();
+	for (const auto& process : processes) {
+		if (!process->isFinished()) {
+			std::cout << std::left << std::setw(20) << process->getName()
+				<< std::left << std::setw(30) << process->getCreationTime();
+
+			// Check if the process has been assigned a core
+			if (process->getCore() != -1) {
+				std::cout << "Core:   " << std::setw(15) << process->getCore();
+				std::cout << std::left << std::setw(1) << process->getCurrentInstruction() << " / "
+					<< process->getTotalInstructions() << "\n";
+			}
+			else {
+				std::cout << "Core:   " << std::setw(15) << " "; // Adjust the width to maintain alignment
+				std::cout << std::left << std::setw(1) << process->getCurrentInstruction() << " / "
+					<< process->getTotalInstructions() << "\n";
+			}
+		}
+	}
+
+	std::cout << "\nFinished processes:\n";
+
+	for (const auto& process : processes) {
+		if (process->isFinished()) {
+			std::cout << std::left << std::setw(20) << process->getName()
+				<< std::left << std::setw(30) << process->getCreationTime()
+				<< "Core:   " << std::setw(15) << process->getCore()
+				<< std::left << std::setw(1) << process->getCurrentInstruction() << " / "
+				<< process->getTotalInstructions() << "\n";
+		}
+	}
+
+	std::cout << "--------------------------------------------\n";
 }
