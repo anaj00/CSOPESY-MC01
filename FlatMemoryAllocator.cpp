@@ -29,6 +29,7 @@ bool FlatMemoryAllocator::allocate(Process process) {
             return true;
         }
     }
+
     return false; // no sufficient free block found
 }
 
@@ -50,14 +51,26 @@ void FlatMemoryAllocator::deallocate(int pid) {
     }
 }
 
-void FlatMemoryAllocator::swapOutRandomProcess() {
-    if (!processMemoryMap.empty()) {
-        int randIndex = rand() % processMemoryMap.size(); // get random index
-        auto it = processMemoryMap.begin(); // get iterator to random index
-        std::advance(it, randIndex); // advance iterator to random index
-        std::cout << "Swapping out process with PID: " << it->first << std::endl;
-        deallocate(it->first);
+int FlatMemoryAllocator::swapOutRandomProcess(const std::unordered_set<int>& runningProcessIDs) {
+    if (processMemoryMap.empty()) {
+        return -1;
     }
+
+    std::vector<int> nonRunningProcesses;
+    for (const auto& entry : processMemoryMap) {
+        if (runningProcessIDs.find(entry.first) == runningProcessIDs.end()) {
+            nonRunningProcesses.push_back(entry.first);
+        }
+    }
+
+    if (nonRunningProcesses.empty()) {
+        return -1;
+    }
+
+    int randIndex = rand() % nonRunningProcesses.size(); // get random index
+    int pid = nonRunningProcesses[randIndex];
+    deallocate(pid);
+    return pid;
 }
 
 void FlatMemoryAllocator::mergeFreeBlocks() {

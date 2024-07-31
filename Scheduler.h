@@ -20,10 +20,12 @@ public:
 
     void addProcess(const Process& process); // Add a process to the ready queue
     std::shared_ptr<Process> getProcessByName(const std::string name);
+    std::shared_ptr<Process> getProcessByID(int pid);
 
     bool initialize(ConfigurationManager* newConfigManager); // Initialize the scheduler with a configuration manager
     void run(); // Start the scheduler
     void stop();
+    const std::vector<std::unique_ptr<CoreWorker>>& getCores() const; 
 
     void displayStatus();
     void saveReport(); 

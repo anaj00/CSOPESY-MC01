@@ -40,6 +40,16 @@ std::shared_ptr<Process> Scheduler::getProcessByName(const std::string name) {
     return nullptr;
 }
 
+std::shared_ptr<Process> Scheduler::getProcessByID(int pid) {
+    std::lock_guard<std::mutex> lock(processMutex);
+    for (auto& process : processes) {
+        if (process->getID() == pid) {
+            return process;
+        }
+    }
+    return nullptr;
+}
+
 bool Scheduler::initialize(ConfigurationManager* newConfigManager) {
     try {
         configManager = newConfigManager;
@@ -96,6 +106,10 @@ void Scheduler::schedulerLoop() {
 
 void Scheduler::stop() {
     running = false;
+}
+
+const std::vector<std::unique_ptr<CoreWorker>>& Scheduler::getCores() const {
+    return cores;
 }
 
 void Scheduler::displayStatus() {

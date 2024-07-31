@@ -7,7 +7,7 @@ min-ins 4000
 max-ins 4000
 delay-per-exec 0.5
 max-overall-mem 512
-min-mem-per-proc 512
-max-mem-per-proc 512
+min-mem-per-proc 256
+max-mem-per-proc 256
 min-page-per-proc 1
 max-page-per-proc 1

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "Process.h"
 #include "ConfigurationManager.h"
@@ -21,7 +22,7 @@ public:
 	void initialize(ConfigurationManager* configManager); // initialize memory blocks
 	bool allocate(Process process);	// allocate memory for a process
 	void deallocate(int pid);
-	void swapOutRandomProcess(); // swap out a random process
+	int swapOutRandomProcess(const std::unordered_set<int>& runningProcessIDs); // swap out a random process
 	void displayMemory();
 
 private:

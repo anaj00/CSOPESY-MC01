@@ -5,6 +5,7 @@
 class Process
 {
 public:
+	Process();
 	Process(std::string name, int id, float totalInstructions, float memorySize, float pageSize);
 
 	std::string getName() const;

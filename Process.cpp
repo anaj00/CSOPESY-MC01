@@ -1,8 +1,22 @@
 #include "Process.h"
 #include <iostream>
 
+Process::Process() : id(0), totalInstructions(0), memorySize(0), pageSize(0) {
+	// Initialize other members if needed
+}
+
 Process::Process(std::string name, int id, float totalInstructions, float memorySize, float pageSize)
-	: processName(name), id(id), currentInstruction(0), totalInstructions(totalInstructions), core(-1), finished(false), creationTime(std::chrono::system_clock::now()){}
+	:	processName(name), 
+		id(id), 
+		currentInstruction(0), 
+		totalInstructions(totalInstructions), 
+		core(-1), 
+		finished(false), 
+		creationTime(std::chrono::system_clock::now()),
+		memorySize(memorySize),
+		pageSize(pageSize)
+
+{}
 
 std::string Process::getName() const {
 	return processName;

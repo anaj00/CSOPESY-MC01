@@ -18,7 +18,7 @@ bool ResourceManager::initialize(ConfigurationManager* newConfigManager){
 	configManager = newConfigManager;
 
 	// Initialize the scheduler and memory manager
-	if (scheduler.initialize(configManager) && memoryManager.initialize(configManager)) {
+	if (scheduler.initialize(configManager) && memoryManager.initialize(configManager, &scheduler)) {
 		running = true;
 		startAllocationThread();
 		return true;
@@ -28,7 +28,6 @@ bool ResourceManager::initialize(ConfigurationManager* newConfigManager){
 }
 
 std::shared_ptr<Process> ResourceManager::createProcess(std::string process_name) {
-
 	std::lock_guard<std::mutex> lock(processMutex);
 
 	processCounter++;
@@ -73,9 +72,7 @@ std::shared_ptr<Process> ResourceManager::findProcessByName(const std::string na
 void ResourceManager::allocateAndScheduleProcesses() {
 	while (running) {
 		std::unique_lock<std::mutex> lock(processMutex);
-		processAdded.wait(lock, [this] { return !running || !processes.empty(); }); 
-
-		// Wait until a process is added or the program is stopped
+		processAdded.wait(lock, [this] { return !running || !processes.empty(); }); // Wait until a process is added or the program is stopped
 
 		if (!running) {
 			break;
@@ -98,6 +95,7 @@ void ResourceManager::allocateAndScheduleProcesses() {
 		}
 	}
 }
+
 
 void ResourceManager::startAllocationThread() {
 	allocationThread = std::thread(&ResourceManager::allocateAndScheduleProcesses, this);
