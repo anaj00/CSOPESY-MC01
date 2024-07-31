@@ -120,33 +120,6 @@ void ConsoleManager::createProcessScreen(const std::string processName) {
 	//switchScreen(processScreen->getName());
 }
 
-//void ConsoleManager::startSchedulerTest() {
-//	std::lock_guard<std::mutex> lock(mtx);
-//	if (!schedulerTest) {
-//		schedulerTest = true;
-//		testThread = std::thread(&ConsoleManager::schedulerTestLoop, this);
-//	}
-//}
-
-//void ConsoleManager::stopSchedulerTest() {
-//	{
-//		std::lock_guard<std::mutex> lock(mtx);
-//		if (schedulerTest) {
-//			schedulerTest = false;
-//		}
-//	}
-//	if (testThread.joinable()) {
-//		testThread.join();  // Ensure the thread is properly joined
-//	}
-//}
-
-//void ConsoleManager::schedulerTestLoop() {
-//	while (schedulerTest) {
-//		createProcess("process_" + std::to_string(processID));
-//		std::this_thread::sleep_for(std::chrono::duration<double>(configManager.getBatchProcessFrequency()));
-//	}
-//}
-
 void ConsoleManager::displayStatus() {
 	// TODO: Create new displayStatus() method in ResourceManager
 	resourceManager.getScheduler()->displayStatus();

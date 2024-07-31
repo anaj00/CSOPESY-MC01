@@ -13,35 +13,47 @@
 class ResourceManager
 {
 public:
-	ResourceManager();
-	~ResourceManager();
+    ResourceManager();
+    ~ResourceManager();
 
-	bool initialize(ConfigurationManager* newConfigManager); // Initialize the scheduler and the memory manager
+    bool initialize(ConfigurationManager* newConfigManager); // Initialize the scheduler and the memory manager
 
-	std::shared_ptr<Process> createProcess(const std::string process_name);
-	bool processExists(std::string name); // Check if a process with the given name exists
-	std::shared_ptr<Process> findProcessByName(const std::string name); // Returns a process by its name
-	void allocateAndScheduleProcesses(); // Allocate memory for processes and schedule them
+    std::shared_ptr<Process> createProcess(const std::string process_name);
+    bool processExists(std::string name); // Check if a process with the given name exists
+    std::shared_ptr<Process> findProcessByName(const std::string name); // Returns a process by its name
+    void allocateAndScheduleProcesses(); // Allocate memory for processes and schedule them
 
-	Scheduler* getScheduler();
-	MemoryManager* getMemoryManager();
+    Scheduler* getScheduler();
+    MemoryManager* getMemoryManager();
+
+    // Scheduler test
+    void startSchedulerTest();
+    void stopSchedulerTest();
 
 private:
-	ConfigurationManager* configManager;
-	MemoryManager memoryManager;
-	Scheduler scheduler;
-	
-	bool running;
-	std::vector<std::shared_ptr<Process>> processes;
-	std::mutex processMutex;
-	std::condition_variable processAdded;
+    ConfigurationManager* configManager;
+    MemoryManager memoryManager;
+    Scheduler scheduler;
 
-	int processCounter;
-	float getRandomFloat(float min, float max); // Randomizer for the process details
-	float getRandomFloatN2(float min, float max); // Randomizer for the process details wherein number = n^2
+    bool running;
+    std::vector<std::shared_ptr<Process>> processes;
+    std::mutex processMutex;
+    std::condition_variable processAdded;
 
-	std::thread allocationThread;
-	void startAllocationThread();
-	void stopAllocationThread();
+    int processCounter;
+    float getRandomFloat(float min, float max); // Randomizer for the process details
+    float getRandomFloatN2(float min, float max); // Randomizer for the process details wherein number = n^2
+
+    std::thread allocationThread;
+    void startAllocationThread();
+    void stopAllocationThread();
+
+    // Scheduler test
+    int schedulerCounter = 0;
+    std::atomic<bool> schedulerTest{ false };
+    std::thread testThread;
+    std::mutex mtx;
+
+    void schedulerTestLoop();
+
 };
-

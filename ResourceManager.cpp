@@ -4,6 +4,7 @@
 #include <ctime>
 #include <random>
 #include <algorithm>
+#include <thread>
 
 ResourceManager::ResourceManager() : processCounter(0) {
 	srand(static_cast<unsigned int>(time(0))); // Seed the random number generator
@@ -136,4 +137,35 @@ Scheduler* ResourceManager::getScheduler()
 MemoryManager* ResourceManager::getMemoryManager()
 {
 	return &memoryManager;
+}
+
+// Scheduler test
+
+void ResourceManager::startSchedulerTest() {
+	std::lock_guard<std::mutex> lock(mtx);
+	if (!schedulerTest) {
+		schedulerTest = true;
+		testThread = std::thread(&ResourceManager::schedulerTestLoop, this);
+	}
+}
+
+void ResourceManager::stopSchedulerTest() {
+	{
+		std::lock_guard<std::mutex> lock(mtx);
+		if (schedulerTest) {
+			schedulerTest = false;
+		}
+	}
+	if (testThread.joinable()) {
+		testThread.join();  // Ensure the thread is properly joined
+	}
+}
+
+void ResourceManager::schedulerTestLoop() {
+	while (schedulerTest) {
+		schedulerCounter++;
+		int processID = schedulerCounter;
+		createProcess("process_test" + std::to_string(processID));
+		std::this_thread::sleep_for(std::chrono::duration<double>(configManager->getBatchProcessFrequency()));
+	}
 }

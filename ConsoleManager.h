@@ -31,8 +31,6 @@ public:
 	ResourceManager& getResourceManager(); // Function to get the scheduler
 	void createProcessScreen(const std::string processName); // Function to create a process screen)
 
-	/*void startSchedulerTest();
-	void stopSchedulerTest();*/
 	void displayStatus();
 
 	bool ifProcessExists(std::string name);
@@ -50,7 +48,6 @@ private:
 	std::thread testThread;
 	std::mutex mtx;
 
-	//std::atomic<bool> schedulerTest{ false };
-	//void schedulerTestLoop();
+	
 };
 

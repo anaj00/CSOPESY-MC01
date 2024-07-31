@@ -103,12 +103,12 @@ void MainMenuScreen::handleCommand(string command) {
             }
 
         } else if (command.substr(0, 9) == "scheduler") {
-            if (command.substr(10) == "test") { // TODO: Implement new scheduler test
-                //consoleManager.startSchedulerTest();
+            if (command.substr(10) == "test") { 
+                consoleManager.getResourceManager().startSchedulerTest();
             }
 
-            else if (command.substr(10) == "stop") { // TODO: Implement new scheduler stop
-                //consoleManager.stopSchedulerTest();
+            else if (command.substr(10) == "stop") { 
+                consoleManager.getResourceManager().stopSchedulerTest();
             } 
 
             else {
