@@ -131,6 +131,8 @@ void MainMenuScreen::handleCommand(string command) {
 			std::cout << "exit - Exit the program" << std::endl;
 		} else if (command == "process-smi") {
             consoleManager.getResourceManager().displayProcessSmi();
+        } else if (command == "vmstat") {
+            consoleManager.getResourceManager().displayVMStat();
         }
 
         else {

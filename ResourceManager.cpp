@@ -246,6 +246,19 @@ void ResourceManager::displayProcessSmi() {
 	std::cout << "--------------------------------------------\n";
 }
 
+void ResourceManager::displayVMStat() {
+	std::cout << configManager->getMaxOverallMemory() << " KB total memory\n";
+	std::cout << memoryManager.flatAllocator.getUsedMemory() << " KB used memory\n";
+	// TODO: implement elements bellow	
+	std::cout << " KB active memory";
+	std::cout << " KB inactive memory\n";;
+	std::cout << " idle cpu ticks\n";
+	std::cout << " active cpu ticks\n";
+	std::cout << " total cpu ticks\n";
+	std::cout << " pages paged in\n";
+	std::cout << " pages paged out\n";
+}
+
 
 int ResourceManager::getCPUUtilization() {
 	int coresUsed = 0;

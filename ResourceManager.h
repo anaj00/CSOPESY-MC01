@@ -34,8 +34,12 @@ public:
     // Display Status
     void displayStatus();
 
-    // process-smi
+    // Process-smi
     void displayProcessSmi();
+
+    // VM Stat
+    void displayVMStat();
+
 private:
     ConfigurationManager* configManager;
     MemoryManager memoryManager;
