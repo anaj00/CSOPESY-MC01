@@ -53,8 +53,10 @@ bool MemoryManager::allocate(Process process) {
             }
 
             return flatAllocator.allocate(process);
+
         } else {
             return true;
+            
         }
     } else if (allocationType == "paging") {
         // Similar handling for paging (not shown here)

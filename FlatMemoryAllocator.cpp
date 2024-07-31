@@ -8,28 +8,39 @@ FlatMemoryAllocator::FlatMemoryAllocator() {
 
 void FlatMemoryAllocator::initialize(ConfigurationManager* newConfigManager) {
     configManager = newConfigManager;
-    memoryBlocks.push_back({ 0, (int) configManager->getMaxOverallMemory(), true});
+    memorySize = static_cast<int>(configManager->getMaxOverallMemory());
+    memoryBlocks.push_back({ 0, memorySize, true }); // Initialize with a single free block of the entire memory
+}
+
+void printBlockInfo(const MemoryBlock& block) {
+	std::cout << "Start: " << block.start
+		<< "\nSize: " << block.size
+		<< "\nStatus: " << (block.isFree ? "Free" : "Allocated") << std::endl << std::endl;
 }
 
 bool FlatMemoryAllocator::allocate(Process process) {
+    int processSize = static_cast<int>(process.getMemorySize());
 
     for (auto& block : memoryBlocks) {
+
         // check if block is free and has enough space for the process
-        if (block.isFree && block.size >= process.getMemorySize()) {
+        if (block.isFree && block.size >= processSize) {
+
+            int currBlockSize = block.size;
+
             block.isFree = false;
+            block.size = process.getMemorySize();
+
             processMemoryMap[process.getID()] = block.start;
 
             // split block if it has more space than the process
-            if (block.size > process.getMemorySize()) {
-                memoryBlocks.push_back({ block.start + ((int) process.getMemorySize()), block.size - ((int) process.getMemorySize()), true});
+            if (currBlockSize > process.getMemorySize()) {
+                memoryBlocks.push_back({ block.start + ((int) process.getMemorySize()), currBlockSize - ((int) process.getMemorySize()), true});
             }
-
-            // update block size to process size
-            block.size = process.getMemorySize();
+            
             return true;
         }
     }
-
     return false; // no sufficient free block found
 }
 
@@ -95,8 +106,9 @@ void FlatMemoryAllocator::mergeFreeBlocks() {
 void FlatMemoryAllocator::displayMemory() {
     std::cout << "Memory Blocks:" << std::endl;
     for (const auto& block : memoryBlocks) {
-        std::cout << "Start: " << block.start << ", Size: " << block.size
-            << ", Status: " << (block.isFree ? "Free" : "Allocated") << std::endl;
+        std::cout << "Start: " << block.start 
+            << "\nSize: " << block.size
+            << "\nStatus: " << (block.isFree ? "Free" : "Allocated") << std::endl << std::endl;
     }
 
 }
