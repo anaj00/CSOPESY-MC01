@@ -30,6 +30,9 @@ public:
     void displayStatus();
     void saveReport(); 
 
+    // Access to core workers and prcesses
+    const std::vector<std::unique_ptr<CoreWorker>>& getCoreWorkers() const;
+    const std::vector<std::shared_ptr<Process>>& getProcesses() const;
 private:
     ConfigurationManager* configManager;
 
