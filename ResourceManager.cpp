@@ -34,9 +34,10 @@ std::shared_ptr<Process> ResourceManager::createProcess(std::string process_name
 	processCounter++;
 
 	// Generate random values for the process
-	float randomMaxInstructions = getRandomInt(configManager->getMinInstructions(), configManager->getMaxInstructions());
-	float randomMemory = getRandomInt2N(configManager->getMinMemoryPerProcess(), configManager->getMaxMemoryPerProcess());
-	float randomPage = getRandomInt(configManager->getMinPagePerProcess(), configManager->getMaxPagePerProcess());
+	int randomMaxInstructions = getRandomInt(configManager->getMinInstructions(), configManager->getMaxInstructions());
+	int randomPage = getRandomInt(configManager->getMinPagePerProcess(), configManager->getMaxPagePerProcess());
+	int randomMemory = getRandomInt2N(configManager->getMinMemoryPerProcess(), configManager->getMaxMemoryPerProcess());
+	
 
 	// Create a new process
 	auto newProcess = std::make_shared<Process>(process_name, processCounter, randomMaxInstructions, randomMemory, randomPage);
@@ -250,7 +251,7 @@ void ResourceManager::displayProcessSmi() {
 	std::cout << "| PROCESS-SMI V01.00 Driver Version 01.00 | \n";
 	std::cout << "--------------------------------------------\n";
 	std::cout << "CPU-Util: " << getCPUUtilization() << "%\n";
-	std::cout << "Memory Usage: " << memoryManager.flatAllocator.getUsedMemory() << "/" << configManager->getMaxOverallMemory()  << "\n";
+	std::cout << "Memory Usage: " << memoryManager.getUsedMemory() << "/" << configManager->getMaxOverallMemory()  << "\n";
 	std::cout << "Memory-Util: "<< getMemoryUtilization() << "%" << "%\n";
 	std::cout << "============================================	\n";
 	std::cout << "Running processes and memory usage: \n";
@@ -260,7 +261,8 @@ void ResourceManager::displayProcessSmi() {
 	for (const auto& process : processes) {
 		if (!process->isFinished() && process->getCore() != -1) {
 			std::cout << std::left << std::setw(20) << process->getName()
-				<< std::left << std::setw(30) << process->getMemorySize() << std::endl;
+				<< std::left << std::setw(30) << process->getMemorySize() << std::endl
+				<< std::left << std::setw(30) << process->getPageSize() << std::endl;
 		}
 	}
 	std::cout << "--------------------------------------------\n";
@@ -268,9 +270,9 @@ void ResourceManager::displayProcessSmi() {
 
 void ResourceManager::displayVMStat() {
 	std::vector<long long> stats = getCoreStats();
-	int usedMemory = memoryManager.flatAllocator.getUsedMemory();
+	int usedMemory = memoryManager.getUsedMemory();
 	int activeMemory = memoryManager.getActiveMemory();
-	int inactiveMemory = usedMemory - activeMemory;
+	int inactiveMemory = configManager->getMaxOverallMemory() - activeMemory;
 
 	std::cout << configManager->getMaxOverallMemory() << " KB total memory\n";
 	std::cout << usedMemory << " KB used memory\n"; // Total used memory, including possible external fragmentation
@@ -300,7 +302,7 @@ int ResourceManager::getCPUUtilization() {
 }
 
 int ResourceManager::getMemoryUtilization() {
-	int usedMemory = memoryManager.flatAllocator.getUsedMemory();
+	int usedMemory = memoryManager.getUsedMemory();
 	int totalMemory = configManager->getMaxOverallMemory();
 	int memoryUtilization = totalMemory ? (usedMemory * 100 / totalMemory) : 0;
 	return memoryUtilization;
@@ -347,8 +349,8 @@ void ResourceManager::saveReport() {
 	file << "CPU utilization: " << cpuUtilization << "%\n";
 	file << "Cores used: " << coresUsed << "\n";
 	file << "Cores available: " << totalCores - coresUsed << "\n";
-	file << "Memory Usage: " << memoryManager.flatAllocator.getUsedMemory() << "/" << configManager->getMaxOverallMemory() << "\n";
-	file << "Memory-Util: " << getMemoryUtilization() << "%" << "%\n";
+	file << "Memory Usage: " << memoryManager.getUsedMemory() << "/" << configManager->getMaxOverallMemory() << "\n";
+	file << "Memory-Util: " << getMemoryUtilization() << "%\n";
 	file << "--------------------------------------------\n";
 
 	file << "Running processes:\n";

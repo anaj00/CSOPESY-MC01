@@ -47,3 +47,29 @@ void PagingAllocator::deallocate(int pid) {
         processPageTable.erase(it);
     }
 }
+
+int PagingAllocator::getUsedMemory(std::vector<std::shared_ptr<Process>> processes) const {
+    int usedMemory = 0;
+
+    for (const auto& process : processes) {
+        // Get the process ID from the process object
+        int pid = process->getID();
+
+        // Find the process ID in the process page table
+        auto it = processPageTable.find(pid);
+        if (it != processPageTable.end()) {
+            // Calculate the memory used by this process
+            usedMemory += (it->second.size() * process->getPageSize()) + 2 - process->getPageSize();
+        }
+    }
+
+    return usedMemory;
+}
+
+std::vector<int> PagingAllocator::getProcessKeys() const {
+    std::vector<int> processIDs;
+    for (const auto& entry : processPageTable) {
+        processIDs.push_back(entry.first);
+    }
+    return processIDs;
+}

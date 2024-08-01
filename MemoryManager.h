@@ -28,6 +28,7 @@ public:
 
     // Get total active memory
     int getActiveMemory();
+    int getUsedMemory();
 
 private:
     void run(); // Method that the thread will execute

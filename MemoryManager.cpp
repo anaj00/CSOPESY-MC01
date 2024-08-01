@@ -113,3 +113,21 @@ int MemoryManager::getActiveMemory() {
     }
     return totalActiveMemory;
 }
+
+int MemoryManager::getUsedMemory() {
+    int totalActiveMemory = 0;
+    if (configManager -> getSchedulerAlgorithm() == "flat") {
+        totalActiveMemory = flatAllocator.getUsedMemory();
+    } else {
+        std::vector<int> processIDs = pagingAllocator.getProcessKeys();
+        std::vector<std::shared_ptr<Process>> allocatedProcesses;
+        
+        for (const auto& id : processIDs) {
+            std::shared_ptr<Process> temp = scheduler->getProcessByID(id);
+            allocatedProcesses.push_back(temp);
+        }
+
+        totalActiveMemory = pagingAllocator.getUsedMemory(allocatedProcesses);
+    }
+    return totalActiveMemory;
+}

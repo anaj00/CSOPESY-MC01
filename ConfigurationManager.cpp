@@ -87,6 +87,14 @@ float ConfigurationManager::getMaxPagePerProcess() const {
 }
 
 std::string ConfigurationManager::getMemoryManagerAlgorithm() const {
+	std::string memoryManagerAlgorithm;
+	
+	if (minPagePerProcess == 1 && maxPagePerProcess == 1) {
+		memoryManagerAlgorithm = "flat";
+	}else {
+		memoryManagerAlgorithm = "paging";
+	}
+
 	return memoryManagerAlgorithm;
 }
 

@@ -59,11 +59,11 @@ std::string Process::getCreationTime() const {
 	return buffer;
 }
 
-float Process::getMemorySize() const {
+int Process::getMemorySize() const {
 	return memorySize;
 }
 
-float Process::getPageSize() const {
+int Process::getPageSize() const {
 	return pageSize;
 }
 
