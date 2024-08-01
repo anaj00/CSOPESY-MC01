@@ -6,7 +6,7 @@ class Process
 {
 public:
 	Process();
-	Process(std::string name, int id, int totalInstructions, int memorySize, int pageSize);
+	Process(std::string name, int id, int totalInstructions, float memorySize, float pageSize);
 
 	std::string getName() const;
 	int getID() const;
@@ -17,8 +17,8 @@ public:
 	void setCore(int coreID);
 	bool isFinished() const;
 	std::string getCreationTime() const;
-	int getMemorySize() const;
-	int getPageSize() const;
+	float getMemorySize() const;
+	float getPageSize() const;
 
 	void execute(); // Executes one instruction
 
@@ -33,7 +33,7 @@ private:
 	int currentInstruction;
 	int totalInstructions;
 	
-	int memorySize;
-	int pageSize;
+	float memorySize;
+	float pageSize;
 };
 

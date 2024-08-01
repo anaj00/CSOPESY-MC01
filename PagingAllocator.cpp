@@ -1,52 +1,118 @@
 #include "PagingAllocator.h"
-
 #include <iostream>
+#include <algorithm>
+#include <ctime>
 
 PagingAllocator::PagingAllocator() {}
 
 void PagingAllocator::initialize(ConfigurationManager* configManager) {
-    configManager = configManager;
-	memory.resize(configManager->getMaxOverallMemory(), -1); // Initialize memory frames to -1 (indicating they are free)
+    this->configManager = configManager;
+    memorySize = configManager->getMaxOverallMemory();
+    pageSize = configManager->getMinPagePerProcess(); // Assume fixed page size for simplicity
+    int numFrames = memorySize / pageSize;
+    memory.resize(numFrames, -1); // Initialize all frames as free
 }
 
-bool PagingAllocator::allocate(Process process) {
-    int pageSize = process.getPageSize();  // Get the page size from the process
-    if (pageSize <= 0) {
-        std::cout << "Page size must be greater than 0";  // Error handling for invalid page size
-        return false;
-    }
+bool PagingAllocator::allocate(Process process, std::function<void(std::shared_ptr<Process>)> swapOutCallback) {
+    int pagesNeeded = (process.getMemorySize() + pageSize - 1) / pageSize;
+    std::vector<int> allocatedFrames;
 
-    int pagesNeeded = (process.getMemorySize() + pageSize - 1) / pageSize;  // Calculate the number of pages needed for the process
-    std::vector<int> allocatedPages;  // Vector to store allocated page indices
-
-    // Iterate through the memory to find free pages
-    for (int i = 0; i < memory.size(); ++i) {
-        if (memory[i] == -1) {  // Check if the page frame is free
-            memory[i] = process.getID();  // Allocate the page to the process
-            allocatedPages.push_back(i);  // Store the allocated page index
-            if (--pagesNeeded == 0) {  // If all needed pages are allocated
-                processPageTable[process.getID()] = allocatedPages;  // Update the process page table
-                return true;  // Allocation successful
+    while (pagesNeeded > 0) {
+        int freeFrame = findFreeFrame();
+        if (freeFrame == -1) {
+            // No free frame found, swap out a random page
+            std::unordered_set<int> runningProcessIDs; // Obtain this from the running processes
+            int swappedOutProcessID = swapOutRandomPage(runningProcessIDs, swapOutCallback);
+            if (swappedOutProcessID == -1) {
+                // Rollback if not enough pages were found
+                for (int frame : allocatedFrames) {
+                    memory[frame] = -1; // Mark the allocated pages as free
+                }
+                return false;
             }
+        }
+        else {
+            memory[freeFrame] = process.getID();
+            allocatedFrames.push_back(freeFrame);
+            --pagesNeeded;
         }
     }
 
-    // Rollback if not enough pages were found
-    for (int page : allocatedPages) {
-        memory[page] = -1;  // Mark the allocated pages as free
-    }
-    return false;  // Allocation failed
+    processPageTable[process.getID()] = allocatedFrames;
+    return true;
 }
+
+
 
 void PagingAllocator::deallocate(int pid) {
     auto it = processPageTable.find(pid);
     if (it != processPageTable.end()) {
-        for (int page : it->second) {
-            memory[page] = -1;
+        for (int frame : it->second) {
+            memory[frame] = -1; // Free the frame
         }
         processPageTable.erase(it);
     }
 }
+
+int PagingAllocator::findFreeFrame() {
+    for (int i = 0; i < memory.size(); ++i) {
+        if (memory[i] == -1) {
+            return i;
+        }
+    }
+    return -1; // No free frame found
+}
+
+int PagingAllocator::swapOutRandomPage(const std::unordered_set<int>& runningProcessIDs, std::function<void(std::shared_ptr<Process>)> swapOutCallback) {
+    std::vector<int> swappableFrames;
+    for (int i = 0; i < memory.size(); ++i) {
+        if (memory[i] != -1 && runningProcessIDs.find(memory[i]) == runningProcessIDs.end()) {
+            swappableFrames.push_back(i);
+        }
+    }
+
+    if (swappableFrames.empty()) {
+        return -1;
+    }
+
+    srand(static_cast<unsigned int>(time(nullptr)));
+    int frameToSwap = swappableFrames[rand() % swappableFrames.size()];
+    swapOutPage(frameToSwap, swapOutCallback);
+    return memory[frameToSwap];
+}
+
+void PagingAllocator::swapOutPage(int frame, std::function<void(std::shared_ptr<Process>)> swapOutCallback) {
+    int pid = memory[frame];
+    if (pid != -1) {
+        //std::cout << "Swapping out page of process " << pid << " from frame " << frame << std::endl;
+        memory[frame] = -1; // Mark frame as free
+
+        auto it = processPageTable.find(pid);
+        if (it != processPageTable.end()) {
+            // Retrieve the process details from a suitable source
+            std::string processName = "Process" + std::to_string(pid); // Example process name
+            int totalInstructions = 1000; // Example total instructions
+            float memorySize = it->second.size() * pageSize; // Calculate memory size from the number of pages
+            float processPageSize = static_cast<float>(pageSize); // Ensure it's a float
+
+            auto swappedOutProcess = std::make_shared<Process>(processName, pid, totalInstructions, memorySize, processPageSize);
+
+            if (swapOutCallback) {
+                swapOutCallback(swappedOutProcess);
+            }
+
+            // Remove the page frame from the process's page table
+            processPageTable[pid].erase(std::remove(processPageTable[pid].begin(), processPageTable[pid].end(), frame), processPageTable[pid].end());
+
+            // If the process has no more pages, remove it from the page table
+            if (processPageTable[pid].empty()) {
+                processPageTable.erase(pid);
+            }
+        }
+    }
+}
+
+
 
 int PagingAllocator::getUsedMemory(std::vector<std::shared_ptr<Process>> processes) const {
     int usedMemory = 0;
@@ -59,7 +125,7 @@ int PagingAllocator::getUsedMemory(std::vector<std::shared_ptr<Process>> process
         auto it = processPageTable.find(pid);
         if (it != processPageTable.end()) {
             // Calculate the memory used by this process
-            usedMemory += (it->second.size() * process->getPageSize()) + 2 - process->getPageSize();
+            usedMemory += (it->second.size() * process->getPageSize());
         }
     }
 

@@ -5,7 +5,7 @@ Process::Process() : id(0), totalInstructions(0), memorySize(0), pageSize(0) {
 	// Initialize other members if needed
 }
 
-Process::Process(std::string name, int id, int totalInstructions, int memorySize, int pageSize)
+Process::Process(std::string name, int id, int totalInstructions, float memorySize, float pageSize)
 	:	processName(name), 
 		id(id), 
 		currentInstruction(0), 
@@ -59,11 +59,11 @@ std::string Process::getCreationTime() const {
 	return buffer;
 }
 
-int Process::getMemorySize() const {
+float Process::getMemorySize() const {
 	return memorySize;
 }
 
-int Process::getPageSize() const {
+float Process::getPageSize() const {
 	return pageSize;
 }
 

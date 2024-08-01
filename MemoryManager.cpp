@@ -1,7 +1,5 @@
 #include <iostream>
-
 #include "MemoryManager.h"
-
 
 MemoryManager::MemoryManager() : running(false), backingStore("backing_store.txt") // Initialize running to false
 {}
@@ -22,7 +20,8 @@ bool MemoryManager::initialize(ConfigurationManager* configManager, Scheduler* s
         // Initialize the memory allocator based on the configuration
         if (allocationType == "flat") {
             flatAllocator.initialize(configManager);
-        } else if (allocationType == "paging") {
+        }
+        else if (allocationType == "paging") {
             pagingAllocator.initialize(configManager);
         }
 
@@ -36,11 +35,9 @@ bool MemoryManager::initialize(ConfigurationManager* configManager, Scheduler* s
     }
 }
 
-
 bool MemoryManager::allocate(Process process) {
     if (allocationType == "flat") {
         if (!flatAllocator.allocate(process)) {
-
             // If allocation fails, swap out a random process and try again
             std::unordered_set<int> runningProcessIDs = getRunningProcessIDs();
             int swappedOutProcessID = flatAllocator.swapOutRandomProcess(runningProcessIDs);
@@ -53,14 +50,35 @@ bool MemoryManager::allocate(Process process) {
             }
 
             return flatAllocator.allocate(process);
-
-        } else {
-            return true;
-            
         }
-    } else if (allocationType == "paging") {
-        // Similar handling for paging (not shown here)
-        return pagingAllocator.allocate(process);
+        else {
+            return true;
+        }
+    }
+    else if (allocationType == "paging") {
+        if (!pagingAllocator.allocate(process, [this](std::shared_ptr<Process> process) {
+            this->backingStore.storeProcess(process);
+            })) {
+            // If allocation fails, swap out a random page and try again
+            std::unordered_set<int> runningProcessIDs = getRunningProcessIDs();
+            int swappedOutProcessID = pagingAllocator.swapOutRandomPage(runningProcessIDs, [this](std::shared_ptr<Process> process) {
+                this->backingStore.storeProcess(process);
+                });
+
+            if (swappedOutProcessID != -1) {
+                auto swappedOutProcess = scheduler->getProcessByID(swappedOutProcessID);
+                if (swappedOutProcess) {
+                    backingStore.storeProcess(swappedOutProcess);
+                }
+            }
+
+            return pagingAllocator.allocate(process, [this](std::shared_ptr<Process> process) {
+                this->backingStore.storeProcess(process);
+                });
+        }
+        else {
+            return true;
+        }
     }
     return false;
 }
@@ -100,7 +118,7 @@ std::unordered_set<int> MemoryManager::getRunningProcessIDs() const {
 }
 
 BackingStore* MemoryManager::getBackingStore() {
-	return &backingStore;
+    return &backingStore;
 }
 
 int MemoryManager::getActiveMemory() {
@@ -116,12 +134,13 @@ int MemoryManager::getActiveMemory() {
 
 int MemoryManager::getUsedMemory() {
     int totalActiveMemory = 0;
-    if (configManager -> getSchedulerAlgorithm() == "flat") {
+    if (configManager->getSchedulerAlgorithm() == "flat") {
         totalActiveMemory = flatAllocator.getUsedMemory();
-    } else {
+    }
+    else {
         std::vector<int> processIDs = pagingAllocator.getProcessKeys();
         std::vector<std::shared_ptr<Process>> allocatedProcesses;
-        
+
         for (const auto& id : processIDs) {
             std::shared_ptr<Process> temp = scheduler->getProcessByID(id);
             allocatedProcesses.push_back(temp);
