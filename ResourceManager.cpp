@@ -268,11 +268,14 @@ void ResourceManager::displayProcessSmi() {
 
 void ResourceManager::displayVMStat() {
 	std::vector<long long> stats = getCoreStats();
+	int usedMemory = memoryManager.flatAllocator.getUsedMemory();
+	int activeMemory = memoryManager.getActiveMemory();
+	int inactiveMemory = usedMemory - activeMemory;
 
 	std::cout << configManager->getMaxOverallMemory() << " KB total memory\n";
-	std::cout << memoryManager.flatAllocator.getUsedMemory() << " KB used memory\n"; // Total used memory, including possible external fragmentation
-	std::cout << memoryManager.flatAllocator.getUsedMemory() << " KB active memory"; // Total active memory used by processes. This doesn’t include possible external fragmentation.
-	std::cout << " KB inactive memory\n"; // External Fragmentation
+	std::cout << usedMemory << " KB used memory\n"; // Total used memory, including possible external fragmentation
+	std::cout << activeMemory << " KB active memory\n"; // Total active memory used by processes. This doesn’t include possible external fragmentation.
+	std::cout << inactiveMemory << " KB inactive memory\n"; // External Fragmentation
 	std::cout << stats[2] << " idle cpu ticks\n"; 
 	std::cout << stats[1] << " active cpu ticks\n";
 	std::cout << stats[0] << " total cpu ticks\n";

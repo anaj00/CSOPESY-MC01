@@ -102,3 +102,14 @@ std::unordered_set<int> MemoryManager::getRunningProcessIDs() const {
 BackingStore* MemoryManager::getBackingStore() {
 	return &backingStore;
 }
+
+int MemoryManager::getActiveMemory() {
+    int totalActiveMemory = 0;
+    for (const auto& core : scheduler->getCores()) {
+        auto process = core->getCurrentProcess();
+        if (process) {
+            totalActiveMemory += process->getMemorySize();
+        }
+    }
+    return totalActiveMemory;
+}

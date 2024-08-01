@@ -26,6 +26,9 @@ public:
     void stop(); // Method to stop the thread
     BackingStore* getBackingStore();
 
+    // Get total active memory
+    int getActiveMemory();
+
 private:
     void run(); // Method that the thread will execute
 

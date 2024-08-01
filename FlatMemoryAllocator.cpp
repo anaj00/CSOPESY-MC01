@@ -113,6 +113,7 @@ void FlatMemoryAllocator::displayMemory() {
 
 }
 
+// Total Memory allocated (active + inacive)
 int FlatMemoryAllocator::getUsedMemory() {
     int usedMemory = 0;
     for (const auto& block : memoryBlocks) {

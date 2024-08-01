@@ -24,8 +24,9 @@ public:
 	void deallocate(int pid);
 	int swapOutRandomProcess(const std::unordered_set<int>& runningProcessIDs); // swap out a random process
 	void displayMemory();
-	int getUsedMemory();
 
+	int getUsedMemory(); // returns active + idle processes 
+	
 private:
 	ConfigurationManager* configManager;
 	std::vector<MemoryBlock> memoryBlocks; // memory blocks
