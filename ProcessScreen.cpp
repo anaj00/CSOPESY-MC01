@@ -34,6 +34,7 @@ void ProcessScreen::displayHeader() {
     std::cout << "--------------------------" << endl;
     // Displays process name and ID
     std::cout << "Process: " << thisProcess->getName() << endl;
+    std::cout << "Memory: " << thisProcess->getMemorySize() << endl;
     std::cout << "ID: " << thisProcess->getID() << endl << endl;
 
     // Prints finished if process is done else print current line and total lines

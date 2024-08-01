@@ -46,7 +46,6 @@ std::shared_ptr<Process> ResourceManager::createProcess(std::string process_name
 	// Notify the allocation thread
 	processAdded.notify_all();
 
-	displayAllProcesses();
 	return newProcess;
 }
 
@@ -257,8 +256,8 @@ void ResourceManager::displayProcessSmi() {
 	std::cout << "Running processes and memory usage: \n";
 	std::cout << "--------------------------------------------\n";
 
-	
-	for (const auto& process : processesMasterList) {
+	const std::vector<std::shared_ptr<Process>>& processes = scheduler.getProcesses();
+	for (const auto& process : processes) {
 		if (!process->isFinished() && process->getCore() != -1) {
 			std::cout << std::left << std::setw(20) << process->getName()
 				<< std::left << std::setw(30) << process->getMemorySize() << std::endl;
