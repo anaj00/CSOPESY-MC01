@@ -34,9 +34,9 @@ std::shared_ptr<Process> ResourceManager::createProcess(std::string process_name
 	processCounter++;
 
 	// Generate random values for the process
-	float randomMaxInstructions = getRandomFloat(configManager->getMinInstructions(), configManager->getMaxInstructions());
-	float randomMemory = getRandomFloatN2(configManager->getMinMemoryPerProcess(), configManager->getMaxMemoryPerProcess());
-	float randomPage = getRandomFloatN2(configManager->getMinPagePerProcess(), configManager->getMaxPagePerProcess());
+	float randomMaxInstructions = getRandomInt(configManager->getMinInstructions(), configManager->getMaxInstructions());
+	float randomMemory = getRandomInt2N(configManager->getMinMemoryPerProcess(), configManager->getMaxMemoryPerProcess());
+	float randomPage = getRandomInt(configManager->getMinPagePerProcess(), configManager->getMaxPagePerProcess());
 
 	// Create a new process
 	auto newProcess = std::make_shared<Process>(process_name, processCounter, randomMaxInstructions, randomMemory, randomPage);
@@ -45,6 +45,8 @@ std::shared_ptr<Process> ResourceManager::createProcess(std::string process_name
 
 	// Notify the allocation thread
 	processAdded.notify_all();
+
+	displayAllProcesses();
 	return newProcess;
 }
 
@@ -113,20 +115,40 @@ void ResourceManager::stopAllocationThread() {
 	}
 }
 
-float ResourceManager::getRandomFloat (float min, float max) {
-	return min + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (max - min)));
+int ResourceManager::getRandomInt (int min, int max) {
+	static std::random_device rd;  // Seed for the random number engine
+	static std::mt19937 gen(rd()); // Mersenne Twister random number engine
+
+	// Create a uniform distribution in the range [min, max]
+	std::uniform_int_distribution<> dis(min, max);
+
+	// Generate a random number in the specified range
+	return dis(gen);
 }
 
-float ResourceManager::getRandomFloatN2(float min, float max) {
+int ResourceManager::getRandomInt2N(int min, int max) {
 
+	int minExp = std::ceil(std::log2(min));
+	// Calculate the largest power of 2 less than or equal to max
+	int maxExp = std::floor(std::log2(max));
+
+	// Ensure the range is valid
+	if (minExp > maxExp) {
+		throw std::invalid_argument("No power of 2 within the given range");
+	}
+
+	// Initialize random number generator
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
-	std::uniform_real_distribution<> dis(std::sqrt(min), std::sqrt(max));
+	std::uniform_int_distribution<> dis(minExp, maxExp);
 
-	float sqrtRandom = dis(gen);
-	float quadraticRandom = sqrtRandom * sqrtRandom;
+	// Generate a random exponent between minExp and maxExp
+	int randomExp = dis(gen);
 
-	return quadraticRandom;
+	// Calculate the power of 2
+	int result = std::pow(2, randomExp);
+
+	return result;
 }
 
 Scheduler* ResourceManager::getScheduler()
@@ -189,7 +211,8 @@ void ResourceManager::displayStatus() {
 	std::cout << "--------------------------------------------\n";
 
 	std::cout << "Running processes:\n";
-	for (const auto& process : processesMasterList) {
+	const std::vector<std::shared_ptr<Process>>& processes = scheduler.getProcesses();
+	for (const auto& process : processes) {
 		if (!process->isFinished()) {
 			std::cout << std::left << std::setw(20) << process->getName()
 				<< std::left << std::setw(30) << process->getCreationTime();
@@ -209,8 +232,7 @@ void ResourceManager::displayStatus() {
 	}
 
 	std::cout << "\nFinished processes:\n";
-
-	for (const auto& process : processesMasterList) {
+	for (const auto& process : processes) {
 		if (process->isFinished()) {
 			std::cout << std::left << std::setw(20) << process->getName()
 				<< std::left << std::setw(30) << process->getCreationTime()

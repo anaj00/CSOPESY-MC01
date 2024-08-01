@@ -56,8 +56,8 @@ private:
     std::condition_variable processAdded;
 
     int processCounter;
-    float getRandomFloat(float min, float max); // Randomizer for the process details
-    float getRandomFloatN2(float min, float max); // Randomizer for the process details wherein number = n^2
+    int getRandomInt(int min, int max); // Randomizer for the process details
+    int getRandomInt2N(int min, int max); // Randomizer for the process details wherein number = 2^n
 
     std::thread allocationThread;
     void startAllocationThread();

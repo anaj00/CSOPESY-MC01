@@ -5,7 +5,7 @@ Process::Process() : id(0), totalInstructions(0), memorySize(0), pageSize(0) {
 	// Initialize other members if needed
 }
 
-Process::Process(std::string name, int id, float totalInstructions, float memorySize, float pageSize)
+Process::Process(std::string name, int id, int totalInstructions, int memorySize, int pageSize)
 	:	processName(name), 
 		id(id), 
 		currentInstruction(0), 
