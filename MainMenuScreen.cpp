@@ -64,6 +64,7 @@ void MainMenuScreen::handleCommand(string command) {
         } else if (command.substr(0,6) == "screen") {
             if (command == "screen -ls") {
                 consoleManager.displayStatus();
+                consoleManager.getResourceManager().getMemoryManager()->getBackingStore()->displayContents();
             }
 
             else if (command.substr(0,9) == "screen -s") { 

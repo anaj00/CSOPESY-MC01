@@ -41,7 +41,6 @@ void ConsoleManager::switchScreen(const std::string consoleName) {
 			// Check if process is finished
 			std::shared_ptr<Process> process = resourceManager.findProcessByName(processName);
 			
-			
 			if (!process->isFinished()) {
 				previousConsole = currentConsole;
 				currentConsole = consoles[consoleName];
@@ -117,7 +116,7 @@ void ConsoleManager::createProcessScreen(const std::string processName) {
 	addConsole(processScreen);
 
 	// Switch to process screen
-	//switchScreen(processScreen->getName());
+	switchScreen(processScreen->getName());
 }
 
 void ConsoleManager::displayStatus() {

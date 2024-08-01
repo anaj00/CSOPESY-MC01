@@ -24,6 +24,7 @@ public:
     void deallocate(int pid);
 
     void stop(); // Method to stop the thread
+    BackingStore* getBackingStore();
 
 private:
     void run(); // Method that the thread will execute

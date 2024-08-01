@@ -3,7 +3,7 @@
 #include "MemoryManager.h"
 
 
-MemoryManager::MemoryManager() : running(false), backingStore("backing_store.dat") // Initialize running to false
+MemoryManager::MemoryManager() : running(false), backingStore("backing_store.txt") // Initialize running to false
 {}
 
 MemoryManager::~MemoryManager() {
@@ -97,4 +97,8 @@ std::unordered_set<int> MemoryManager::getRunningProcessIDs() const {
         }
     }
     return runningProcessIDs;
+}
+
+BackingStore* MemoryManager::getBackingStore() {
+	return &backingStore;
 }

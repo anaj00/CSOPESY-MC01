@@ -13,10 +13,14 @@ public:
     void storeProcess(std::shared_ptr<Process> process);
     std::shared_ptr<Process> loadProcess(int pid);
     void removeProcess(int pid);
+    void displayContents() const;
 
 private:
     std::string filename;
     std::unordered_map<int, std::shared_ptr<Process>> storedProcesses;
     std::ofstream outputFile;
     std::ifstream inputFile;
+
+    void openFiles();
+    void closeFiles();
 };
