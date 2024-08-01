@@ -24,11 +24,11 @@ void CoreWorker::setProcess(std::shared_ptr<Process> process) {
 }
 
 void CoreWorker::runProcess() {
-
     // For SJF and FCFS
     if (quantumSlice == 0) {
         // While there is still a process, run
         while (currentProcess && !currentProcess->isFinished()) {
+            totalActiveTicks++;
             currentProcess->execute();
             std::this_thread::sleep_for(std::chrono::duration<float>(delayPerExec));
         }
@@ -49,7 +49,7 @@ void CoreWorker::runProcess() {
             currentProcess->execute();
             std::this_thread::sleep_for(std::chrono::duration<float>(delayPerExec));
         }
-
+        totalActiveTicks++;
         // Process is not finished, notify Scheduler
         if (processCompletionCallback) {
             processCompletionCallback(currentProcess);
@@ -107,9 +107,13 @@ void CoreWorker::run() {
                 break;
             }
         }
-
+        totalCPUTicks++;
         if (processAssigned) {
             runProcess();
+        }
+        else {
+            totalIdleTicks++;
+            // TODO: might need to add delay here
         }
     }
 }
@@ -118,4 +122,8 @@ void CoreWorker::run() {
 void CoreWorker::setProcessCompletionCallback(std::function<void(std::shared_ptr<Process>)> callback) {
     std::lock_guard<std::mutex> lock(coreMutex);
     processCompletionCallback = callback;
+}
+
+std::vector<long long> CoreWorker::getStats() {
+    return { totalCPUTicks, totalActiveTicks, totalIdleTicks };
 }

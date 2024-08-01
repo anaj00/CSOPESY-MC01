@@ -10,6 +10,7 @@
 #include <mutex>
 #include <thread>
 #include <condition_variable>
+#include <fstream>
 
 class ResourceManager
 {
@@ -40,6 +41,8 @@ public:
     // VM Stat
     void displayVMStat();
 
+    // Report-util
+    void saveReport();
 private:
     ConfigurationManager* configManager;
     MemoryManager memoryManager;
@@ -68,4 +71,5 @@ private:
 
     int getCPUUtilization();
     int getMemoryUtilization();
+    std::vector<long long> getCoreStats();
 };

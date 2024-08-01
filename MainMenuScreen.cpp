@@ -117,7 +117,7 @@ void MainMenuScreen::handleCommand(string command) {
 
         } else if (command == "report-util") {
             // TODO: Implement new report utility with memory details
-            consoleManager.getResourceManager().getScheduler()->saveReport();
+            consoleManager.getResourceManager().saveReport();
 
 		} else if (command == "help") {
 			std::cout << "\nCommands:" << std::endl;

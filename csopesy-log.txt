@@ -1,15 +1,16 @@
-CPU utilization: 0%
-Cores used: 0
-Cores available: 4
+CPU utilization: 75%
+Cores used: 3
+Cores available: 1
+Memory Usage: 768/768
+Memory-Util: 100%%
 --------------------------------------------
 Running processes:
+process_test1       08/01/2024 07:12:18PM         Core:   1              5 / 4000
+ Memory Size: 256
+process_test2       08/01/2024 07:12:18PM         Core:   2              4 / 4000
+ Memory Size: 256
+process_test3       08/01/2024 07:12:19PM         Core:   3              3 / 4000
+ Memory Size: 256
 
 Finished processes:
-test                07/05/2024 03:03:49AM         Core:   1              1450 / 1450
-SchedTest_0_0       07/05/2024 03:04:49AM         Core:   1              1756 / 1756
-SchedTest_0_1       07/05/2024 03:04:51AM         Core:   2              1478 / 1478
-SchedTest_0_2       07/05/2024 03:04:53AM         Core:   3              1527 / 1527
-SchedTest_0_3       07/05/2024 03:04:55AM         Core:   4              1025 / 1025
-SchedTest_0_4       07/05/2024 03:04:57AM         Core:   2              1656 / 1656
-SchedTest_0_5       07/05/2024 03:04:59AM         Core:   4              1553 / 1553
 --------------------------------------------

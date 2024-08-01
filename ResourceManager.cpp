@@ -229,9 +229,9 @@ void ResourceManager::displayProcessSmi() {
 	std::cout << "--------------------------------------------\n";
 	std::cout << "| PROCESS-SMI V01.00 Driver Version 01.00 | \n";
 	std::cout << "--------------------------------------------\n";
-	std::cout << "CPU-Util: " << this->getCPUUtilization() << "%\n";
+	std::cout << "CPU-Util: " << getCPUUtilization() << "%\n";
 	std::cout << "Memory Usage: " << memoryManager.flatAllocator.getUsedMemory() << "/" << configManager->getMaxOverallMemory()  << "\n";
-	std::cout << "Memory-Util: "<< this->getMemoryUtilization() << "%" << "%\n";
+	std::cout << "Memory-Util: "<< getMemoryUtilization() << "%" << "%\n";
 	std::cout << "============================================	\n";
 	std::cout << "Running processes and memory usage: \n";
 	std::cout << "--------------------------------------------\n";
@@ -247,14 +247,15 @@ void ResourceManager::displayProcessSmi() {
 }
 
 void ResourceManager::displayVMStat() {
+	std::vector<long long> stats = getCoreStats();
+
 	std::cout << configManager->getMaxOverallMemory() << " KB total memory\n";
-	std::cout << memoryManager.flatAllocator.getUsedMemory() << " KB used memory\n";
-	// TODO: implement elements bellow	
-	std::cout << " KB active memory";
-	std::cout << " KB inactive memory\n";;
-	std::cout << " idle cpu ticks\n";
-	std::cout << " active cpu ticks\n";
-	std::cout << " total cpu ticks\n";
+	std::cout << memoryManager.flatAllocator.getUsedMemory() << " KB used memory\n"; // Total used memory, including possible external fragmentation
+	std::cout << memoryManager.flatAllocator.getUsedMemory() << " KB active memory"; // Total active memory used by processes. This doesn’t include possible external fragmentation.
+	std::cout << " KB inactive memory\n"; // External Fragmentation
+	std::cout << stats[2] << " idle cpu ticks\n"; 
+	std::cout << stats[1] << " active cpu ticks\n";
+	std::cout << stats[0] << " total cpu ticks\n";
 	std::cout << " pages paged in\n";
 	std::cout << " pages paged out\n";
 }
@@ -281,4 +282,89 @@ int ResourceManager::getMemoryUtilization() {
 	int memoryUtilization = totalMemory ? (usedMemory * 100 / totalMemory) : 0;
 	return memoryUtilization;
 }
+
+std::vector<long long> ResourceManager::getCoreStats() {
+	const std::vector<std::unique_ptr<CoreWorker>>& cores = scheduler.getCoreWorkers();
+	long long cpuTicks = 0;
+	long long activeTicks = 0;
+	long long idleTicks = 0;
+
+	for (const auto& core : cores) {
+		std::vector<long long> stats = core->getStats();
+		cpuTicks += stats[0];
+		activeTicks += stats[1];
+		idleTicks += stats[2];
+	}
+
+	return { cpuTicks, activeTicks, idleTicks };
+}
+
+void ResourceManager::saveReport() {
+	std::cout << "Saving report..." << std::endl;
+
+	std::ofstream file("csopesy-log.txt");
+	if (!file) {
+		std::cerr << "Error opening file." << std::endl;
+		return;
+	}
+
+	std::lock_guard<std::mutex> lock(processMutex);
+
+	int coresUsed = 0;
+	const std::vector<std::unique_ptr<CoreWorker>>& cores = scheduler.getCoreWorkers();
+	for (const auto& core : cores) {
+		if (core->isAssignedProcess()) {
+			coresUsed++;
+		}
+	}
+
+	int totalCores = cores.size();
+	int cpuUtilization = totalCores ? (coresUsed * 100 / totalCores) : 0;
+
+	file << "CPU utilization: " << cpuUtilization << "%\n";
+	file << "Cores used: " << coresUsed << "\n";
+	file << "Cores available: " << totalCores - coresUsed << "\n";
+	file << "Memory Usage: " << memoryManager.flatAllocator.getUsedMemory() << "/" << configManager->getMaxOverallMemory() << "\n";
+	file << "Memory-Util: " << getMemoryUtilization() << "%" << "%\n";
+	file << "--------------------------------------------\n";
+
+	file << "Running processes:\n";
+	const std::vector<std::shared_ptr<Process>>& processes = scheduler.getProcesses();
+	for (const auto& process : processes) {
+		if (!process->isFinished()) {
+			file << std::left << std::setw(20) << process->getName()
+				<< std::left << std::setw(30) << process->getCreationTime();
+
+			// Check if the process has been assigned a core
+			if (process->getCore() != -1) {
+				file << "Core:   " << std::setw(15) << process->getCore();
+				file << std::left << std::setw(1) << process->getCurrentInstruction() << " / "
+					<< process->getTotalInstructions() << "\n";
+				file << " Memory Size: " << process->getMemorySize() << "\n";
+			}
+			else {
+				file << "Core:   " << std::setw(15) << " "; // Adjust the width to maintain alignment
+				file << std::left << std::setw(1) << process->getCurrentInstruction() << " / "
+					<< process->getTotalInstructions() << "\n";
+			}
+		}
+	}
+
+	file << "\nFinished processes:\n";
+
+	for (const auto& process : processes) {
+		if (process->isFinished()) {
+			file << std::left << std::setw(20) << process->getName()
+				<< std::left << std::setw(30) << process->getCreationTime()
+				<< "Core:   " << std::setw(15) << process->getCore()
+				<< std::left << std::setw(1) << process->getCurrentInstruction() << " / "
+				<< process->getTotalInstructions() << "\n";
+		}
+	}
+
+	file << "--------------------------------------------\n";
+
+	std::cout << "Report saved at csopesy-log.txt!" << std::endl;
+}
+
 

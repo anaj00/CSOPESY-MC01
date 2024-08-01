@@ -4,7 +4,11 @@
 #include <memory>
 #include <mutex>
 #include <functional>
+#include <vector>
+
 #include "Process.h"
+
+
 
 class CoreWorker
 {
@@ -26,6 +30,7 @@ public:
 
     void setProcessCompletionCallback(std::function<void(std::shared_ptr<Process>)> callback);
 
+    std::vector<long long> getStats();
 
 private:
     int id;
@@ -40,4 +45,10 @@ private:
 
     void run();
     std::function<void(std::shared_ptr<Process>)> processCompletionCallback;
+
+    // Stat trackers
+    long long totalCPUTicks = 0;
+    long long totalActiveTicks = 0;
+    long long totalIdleTicks = 0;
+
 };
