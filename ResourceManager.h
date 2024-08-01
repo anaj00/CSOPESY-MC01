@@ -43,6 +43,7 @@ public:
 
     // Report-util
     void saveReport();
+    void displayAllProcesses();
 private:
     ConfigurationManager* configManager;
     MemoryManager memoryManager;
@@ -50,6 +51,7 @@ private:
 
     bool running;
     std::vector<std::shared_ptr<Process>> processes;
+    std::vector<std::shared_ptr<Process>> processesMasterList;
     std::mutex processMutex;
     std::condition_variable processAdded;
 

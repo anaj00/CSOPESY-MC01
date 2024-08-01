@@ -41,28 +41,28 @@ std::shared_ptr<Process> ResourceManager::createProcess(std::string process_name
 	// Create a new process
 	auto newProcess = std::make_shared<Process>(process_name, processCounter, randomMaxInstructions, randomMemory, randomPage);
 	processes.push_back(newProcess);
+	processesMasterList.push_back(newProcess);
 
 	// Notify the allocation thread
 	processAdded.notify_all();
-
 	return newProcess;
 }
 
 bool ResourceManager::processExists(std::string name) {
-	auto it = std::find_if(processes.begin(), processes.end(),
+	auto it = std::find_if(processesMasterList.begin(), processesMasterList.end(),
 		[&name](const std::shared_ptr<Process>& process) {
 			return process->getName() == name;
 		});
-	return it != processes.end();
+	return it != processesMasterList.end();
 }
 
 std::shared_ptr<Process> ResourceManager::findProcessByName(const std::string name) {
-	auto it = std::find_if(processes.begin(), processes.end(),
+	auto it = std::find_if(processesMasterList.begin(), processesMasterList.end(),
 		[&name](const std::shared_ptr<Process>& process) {
 			return process->getName() == name;
 		});
 
-	if (it != processes.end()) {
+	if (it != processesMasterList.end()) {
 		return *it;
 	}
 	else {
@@ -189,8 +189,7 @@ void ResourceManager::displayStatus() {
 	std::cout << "--------------------------------------------\n";
 
 	std::cout << "Running processes:\n";
-	const std::vector<std::shared_ptr<Process>>& processes = scheduler.getProcesses();
-	for (const auto& process : processes) {
+	for (const auto& process : processesMasterList) {
 		if (!process->isFinished()) {
 			std::cout << std::left << std::setw(20) << process->getName()
 				<< std::left << std::setw(30) << process->getCreationTime();
@@ -211,7 +210,7 @@ void ResourceManager::displayStatus() {
 
 	std::cout << "\nFinished processes:\n";
 
-	for (const auto& process : processes) {
+	for (const auto& process : processesMasterList) {
 		if (process->isFinished()) {
 			std::cout << std::left << std::setw(20) << process->getName()
 				<< std::left << std::setw(30) << process->getCreationTime()
@@ -236,8 +235,8 @@ void ResourceManager::displayProcessSmi() {
 	std::cout << "Running processes and memory usage: \n";
 	std::cout << "--------------------------------------------\n";
 
-	const std::vector<std::shared_ptr<Process>>& processes = scheduler.getProcesses();
-	for (const auto& process : processes) {
+	
+	for (const auto& process : processesMasterList) {
 		if (!process->isFinished() && process->getCore() != -1) {
 			std::cout << std::left << std::setw(20) << process->getName()
 				<< std::left << std::setw(30) << process->getMemorySize() << std::endl;
@@ -329,8 +328,7 @@ void ResourceManager::saveReport() {
 	file << "--------------------------------------------\n";
 
 	file << "Running processes:\n";
-	const std::vector<std::shared_ptr<Process>>& processes = scheduler.getProcesses();
-	for (const auto& process : processes) {
+	for (const auto& process : processesMasterList) {
 		if (!process->isFinished()) {
 			file << std::left << std::setw(20) << process->getName()
 				<< std::left << std::setw(30) << process->getCreationTime();
@@ -352,7 +350,7 @@ void ResourceManager::saveReport() {
 
 	file << "\nFinished processes:\n";
 
-	for (const auto& process : processes) {
+	for (const auto& process : processesMasterList) {
 		if (process->isFinished()) {
 			file << std::left << std::setw(20) << process->getName()
 				<< std::left << std::setw(30) << process->getCreationTime()
@@ -367,4 +365,13 @@ void ResourceManager::saveReport() {
 	std::cout << "Report saved at csopesy-log.txt!" << std::endl;
 }
 
+void ResourceManager::displayAllProcesses() {
+	const std::vector<std::shared_ptr<Process>>& processes = scheduler.getProcesses();
+	std::cout << "=========================\n";
+	std::cout << "in display all processes\n";
+	for (auto& process : processes) {
+		std::cout << process->getName() << "\n";
+	}
+	std::cout << "=========================\n";
+}
 
