@@ -26,6 +26,7 @@ public:
 	float getMinPagePerProcess() const; // Returns the minimum number of pages per process
 	float getMaxPagePerProcess() const; // Returns the maximum number of pages per process
 	std::string getMemoryManagerAlgorithm() const; // Returns the memory manager algorithm
+	float getMaxFrames() const; // Returns the maximum number of frames
 
 private:
 	void parseConfigFile();	// Parses the config file and sets the configuration values
@@ -47,5 +48,9 @@ private:
 	float minPagePerProcess;
 	float maxPagePerProcess;
 	std::string memoryManagerAlgorithm;
+
+	float maxFrames;
+
+	int getRandomInt2N(int min, int max); // Randomizer for the process details wherein number = 2^n
 };
 

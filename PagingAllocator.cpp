@@ -7,14 +7,15 @@ PagingAllocator::PagingAllocator() {}
 
 void PagingAllocator::initialize(ConfigurationManager* configManager) {
     this->configManager = configManager;
+
     memorySize = configManager->getMaxOverallMemory();
-    pageSize = configManager->getMinPagePerProcess(); // Assume fixed page size for simplicity
+    pageSize = configManager->getMinPagePerProcess(); // I dont think need?
     int numFrames = memorySize / pageSize;
     memory.resize(numFrames, -1); // Initialize all frames as free
 }
 
 bool PagingAllocator::allocate(Process process, std::function<void(std::shared_ptr<Process>)> swapOutCallback) {
-    int pagesNeeded = (process.getMemorySize() + pageSize - 1) / pageSize;
+    int pagesNeeded = pageSize;
     std::vector<int> allocatedFrames;
 
     while (pagesNeeded > 0) {
@@ -23,6 +24,7 @@ bool PagingAllocator::allocate(Process process, std::function<void(std::shared_p
             // No free frame found, swap out a random page
             std::unordered_set<int> runningProcessIDs; // Obtain this from the running processes
             int swappedOutProcessID = swapOutRandomPage(runningProcessIDs, swapOutCallback);
+
             if (swappedOutProcessID == -1) {
                 // Rollback if not enough pages were found
                 for (int frame : allocatedFrames) {
@@ -81,6 +83,7 @@ int PagingAllocator::swapOutRandomPage(const std::unordered_set<int>& runningPro
     return memory[frameToSwap];
 }
 
+// TODO: Fix the shit
 void PagingAllocator::swapOutPage(int frame, std::function<void(std::shared_ptr<Process>)> swapOutCallback) {
     int pid = memory[frame];
     if (pid != -1) {

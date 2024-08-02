@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include "ConfigurationManager.h"
+#include <random>
 
 ConfigurationManager::ConfigurationManager()
 	: numCPU(0), quantumCycles(0), preemptive(false), batchProcessFrequency(0), minInstructions(0), maxInstructions(0), delayPerExec(0), maxOverallMemory(0), minMemoryPerProcess(0), maxMemoryPerProcess(0), minPagePerProcess(0), maxPagePerProcess(0), memoryManagerAlgorithm("")
@@ -175,8 +176,21 @@ void ConfigurationManager::parseConfigFile() {
 		// If it’s >1, it’s a paging allocator
 	if (minPagePerProcess == 1 && maxPagePerProcess == 1) {
 		memoryManagerAlgorithm = "flat";
+
 	} else {
 		memoryManagerAlgorithm = "paging";
+
+		// Since paging will have set number of frames per process
+		int randomMemorySize = getRandomInt2N(minMemoryPerProcess, maxMemoryPerProcess);
+		int randomPageSize = getRandomInt2N(minPagePerProcess, maxPagePerProcess);
+
+		minMemoryPerProcess = randomMemorySize;
+		maxMemoryPerProcess = randomMemorySize;
+		minPagePerProcess = randomPageSize;
+		maxPagePerProcess = randomPageSize;
+
+		// Calculate the maximum number of frames
+		maxFrames = maxOverallMemory / randomPageSize;
 	}
 }
 
@@ -198,4 +212,29 @@ void ConfigurationManager::printConfig() {
 	std::cout << "max-page-per-proc: " << maxPagePerProcess << std::endl;
 	std::cout << "memory-manager: " << memoryManagerAlgorithm << std::endl; // "flat" or "paging"
 	std::cout << "--------------------------" << std::endl;
+}
+
+int ConfigurationManager::getRandomInt2N(int min, int max) {
+
+	int minExp = std::ceil(std::log2(min));
+	// Calculate the largest power of 2 less than or equal to max
+	int maxExp = std::floor(std::log2(max));
+
+	// Ensure the range is valid
+	if (minExp > maxExp) {
+		throw std::invalid_argument("No power of 2 within the given range");
+	}
+
+	// Initialize random number generator
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dis(minExp, maxExp);
+
+	// Generate a random exponent between minExp and maxExp
+	int randomExp = dis(gen);
+
+	// Calculate the power of 2
+	int result = std::pow(2, randomExp);
+
+	return result;
 }
