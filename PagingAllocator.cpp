@@ -36,6 +36,7 @@ bool PagingAllocator::allocate(Process process, std::function<void(std::shared_p
         else {
             memory[freeFrame] = process.getID();
             allocatedFrames.push_back(freeFrame);
+            ++numPagesPagedIn; // Increment the counter for pages paged in
             --pagesNeeded;
         }
     }
@@ -89,6 +90,7 @@ void PagingAllocator::swapOutPage(int frame, std::function<void(std::shared_ptr<
     if (pid != -1) {
         //std::cout << "Swapping out page of process " << pid << " from frame " << frame << std::endl;
         memory[frame] = -1; // Mark frame as free
+        ++numPagesPagedOut;
 
         auto it = processPageTable.find(pid);
         if (it != processPageTable.end()) {
@@ -141,4 +143,12 @@ std::vector<int> PagingAllocator::getProcessKeys() const {
         processIDs.push_back(entry.first);
     }
     return processIDs;
+}
+
+int PagingAllocator::getNumPagesPagedIn() const {
+    return numPagesPagedIn;
+}
+
+int PagingAllocator::getNumPagesPagedOut() const {
+    return numPagesPagedOut;
 }

@@ -91,8 +91,6 @@ void ResourceManager::allocateAndScheduleProcesses() {
 			scheduler.addProcess(*process);
 		}
 		else {
-			// If memory allocation fails, remove the process from the list
-			// This should not happen if the memory manager is working correctly with a backing store
 			std::lock_guard<std::mutex> lock(processMutex);
 			processes.erase(std::remove(processes.begin(), processes.end(), process), processes.end());
 		}
@@ -273,6 +271,8 @@ void ResourceManager::displayVMStat() {
 	int usedMemory = memoryManager.getUsedMemory();
 	int activeMemory = memoryManager.getActiveMemory();
 	int inactiveMemory = configManager->getMaxOverallMemory() - activeMemory;
+	int pagedIn = memoryManager.pagingAllocator.getNumPagesPagedIn();
+	int pagedOut = memoryManager.pagingAllocator.getNumPagesPagedOut();
 
 	std::cout << configManager->getMaxOverallMemory() << " KB total memory\n";
 	std::cout << usedMemory << " KB used memory\n"; // Total used memory, including possible external fragmentation
@@ -281,8 +281,8 @@ void ResourceManager::displayVMStat() {
 	std::cout << stats[2] << " idle cpu ticks\n"; 
 	std::cout << stats[1] << " active cpu ticks\n";
 	std::cout << stats[0] << " total cpu ticks\n";
-	std::cout << " pages paged in\n";
-	std::cout << " pages paged out\n";
+	std::cout << pagedIn << " pages paged in\n";
+	std::cout << pagedOut << " pages paged out\n";
 }
 
 

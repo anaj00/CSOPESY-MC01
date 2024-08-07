@@ -21,11 +21,15 @@ public:
     std::vector<int> getProcessKeys() const;
     int swapOutRandomPage(const std::unordered_set<int>& runningProcessIDs, std::function<void(std::shared_ptr<Process>)> swapOutCallback);
 
+    int getNumPagesPagedIn() const;
+    int getNumPagesPagedOut() const;
 
 private:
     ConfigurationManager* configManager;
     int memorySize;
     int pageSize;
+    int numPagesPagedIn;
+    int numPagesPagedOut;
 
     std::vector<int> memory; // memory represented as page frames
     std::unordered_map<int, std::vector<int>> processPageTable; // map of process id to page frames
