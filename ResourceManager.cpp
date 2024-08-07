@@ -270,7 +270,7 @@ void ResourceManager::displayVMStat() {
 	std::vector<long long> stats = getCoreStats();
 	int usedMemory = memoryManager.getUsedMemory();
 	int activeMemory = memoryManager.getActiveMemory();
-	int inactiveMemory = configManager->getMaxOverallMemory() - activeMemory;
+	int inactiveMemory = memoryManager.getInactiveMemory();
 	int pagedIn = memoryManager.pagingAllocator.getNumPagesPagedIn();
 	int pagedOut = memoryManager.pagingAllocator.getNumPagesPagedOut();
 

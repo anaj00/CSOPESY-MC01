@@ -150,3 +150,14 @@ int MemoryManager::getUsedMemory() {
     }
     return totalActiveMemory;
 }
+
+int MemoryManager::getInactiveMemory() {
+    int totalInactiveMemory = 0;
+    if (configManager->getSchedulerAlgorithm() == "flat") {
+        totalInactiveMemory = flatAllocator.getInactiveMemory(getRunningProcessIDs());
+    }
+    else {
+        totalInactiveMemory = pagingAllocator.getInactiveMemory(getRunningProcessIDs());
+    }
+    return totalInactiveMemory;
+}

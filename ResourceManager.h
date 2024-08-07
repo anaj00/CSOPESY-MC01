@@ -74,4 +74,5 @@ private:
     int getCPUUtilization();
     int getMemoryUtilization();
     std::vector<long long> getCoreStats();
+    int getInactiveMemory();
 };

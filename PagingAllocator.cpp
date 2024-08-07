@@ -152,3 +152,13 @@ int PagingAllocator::getNumPagesPagedIn() const {
 int PagingAllocator::getNumPagesPagedOut() const {
     return numPagesPagedOut;
 }
+
+int PagingAllocator::getInactiveMemory(const std::unordered_set<int>& runningProcessIDs) const {
+    int inactiveMemory = 0;
+    for (const auto& entry : processPageTable) {
+        if (runningProcessIDs.find(entry.first) == runningProcessIDs.end()) {
+            inactiveMemory += entry.second.size() * pageSize;
+        }
+    }
+    return inactiveMemory;
+}

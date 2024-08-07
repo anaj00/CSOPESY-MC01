@@ -26,6 +26,7 @@ public:
 	void displayMemory();
 
 	int getUsedMemory(); // returns active + idle processes 
+	int getInactiveMemory(const std::unordered_set<int>& runningProcessIDs);
 	
 private:
 	ConfigurationManager* configManager;
