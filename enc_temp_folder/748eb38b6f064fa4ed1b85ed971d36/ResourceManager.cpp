@@ -259,7 +259,8 @@ void ResourceManager::displayProcessSmi() {
 	for (const auto& process : processes) {
 		if (!process->isFinished() && process->getCore() != -1) {
 			std::cout << std::left << std::setw(20) << process->getName()
-				<< std::left << std::setw(30) << process->getMemorySize() << std::endl;
+				<< std::left << std::setw(30) << process->getMemorySize() << std::endl
+				<< std::left << std::setw(30) << process->getPageSize() << std::endl;
 		}
 	}
 	std::cout << "--------------------------------------------\n";
@@ -269,7 +270,7 @@ void ResourceManager::displayVMStat() {
 	std::vector<long long> stats = getCoreStats();
 	int usedMemory = memoryManager.getUsedMemory();
 	int activeMemory = memoryManager.getActiveMemory();
-	int inactiveMemory = memoryManager.getInactiveMemory();
+	int inactiveMemory = configManager->getMaxOverallMemory() - activeMemory;
 	int pagedIn = memoryManager.pagingAllocator.getNumPagesPagedIn();
 	int pagedOut = memoryManager.pagingAllocator.getNumPagesPagedOut();
 
