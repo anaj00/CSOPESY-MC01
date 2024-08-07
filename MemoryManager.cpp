@@ -49,8 +49,7 @@ bool MemoryManager::allocate(Process process) {
                 }
             }
 
-            // If no process was swapped out, allocation fails
-            return false;
+            return flatAllocator.allocate(process);
         }
         else {
             return true;
@@ -73,8 +72,9 @@ bool MemoryManager::allocate(Process process) {
                 }
             }
 
-            // If no page was swapped out, allocation fails
-            return false;
+            return pagingAllocator.allocate(process, [this](std::shared_ptr<Process> process) {
+                this->backingStore.storeProcess(process);
+            });
         }
         else {
             return true;
